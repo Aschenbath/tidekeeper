@@ -1,0 +1,21 @@
+{
+  "id": "m03",
+  "title": "Low Water",
+  "coach": ["Turn the tide dial to see what the sea will do."],
+  "grid": ["~..~~", "H..=D", "~..~~"],
+  "harbors": [{ "id": "h1", "x": 0, "y": 1, "exit": "E" }],
+  "docks": [{ "x": 4, "y": 1, "open": "W", "shape": "circle" }],
+  "fixed": [{ "x": 3, "y": 1, "piece": "straight", "rot": 1 }],
+  "bars": [{ "x": 3, "y": 1, "threshold": 2 }],
+  "tide": [2, 1, 0, 0, 1, 2, 2, 1],
+  "boats": [{ "id": "b1", "harbor": "h1", "shape": "circle", "launch": 0 }],
+  "budget": { "straight": 2, "bend": 4, "lock": 0 },
+  "tickLimit": 12,
+  "mastery": { "kind": "arriveBy", "value": 6 },
+  "solution": [
+    { "x": 1, "y": 1, "piece": "bend", "rot": 3 },
+    { "x": 1, "y": 0, "piece": "bend", "rot": 1 },
+    { "x": 2, "y": 0, "piece": "bend", "rot": 2 },
+    { "x": 2, "y": 1, "piece": "bend", "rot": 0 }
+  ]
+}

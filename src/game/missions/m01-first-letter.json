@@ -1,0 +1,19 @@
+{
+  "id": "m01",
+  "title": "First Letter",
+  "coach": ["Pinch the bend and drop it in the glowing square."],
+  "grid": ["~~~~~", "H=.##", "##=##", "##D##"],
+  "harbors": [{ "id": "h1", "x": 0, "y": 1, "exit": "E" }],
+  "docks": [{ "x": 2, "y": 3, "open": "N", "shape": "circle" }],
+  "fixed": [
+    { "x": 1, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 2, "y": 2, "piece": "straight", "rot": 0 }
+  ],
+  "bars": [],
+  "tide": [1],
+  "boats": [{ "id": "b1", "harbor": "h1", "shape": "circle", "launch": 0 }],
+  "budget": { "straight": 0, "bend": 1, "lock": 0 },
+  "tickLimit": 10,
+  "mastery": { "kind": "arriveBy", "value": 4 },
+  "solution": [{ "x": 2, "y": 1, "piece": "bend", "rot": 2 }]
+}
