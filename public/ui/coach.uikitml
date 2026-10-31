@@ -1,0 +1,8 @@
+<style>
+  .coach { width: 26; flex-direction: column; align-items: center; gap: 0.4; padding: 0.5; background-color: #f3e8ce; border-radius: 1; }
+  .text { color: #26484e; font-size: 1.15; text-align: center; }
+</style>
+<div class="coach">
+  <span id="CoachText" class="text">Pinch the bend. Drop it in the glowing square.</span>
+  <span id="TrayCounts" class="text">Straight 0 / Bend 1 / Lock 0</span>
+</div>

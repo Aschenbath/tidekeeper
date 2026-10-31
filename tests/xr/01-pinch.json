@@ -1,0 +1,160 @@
+{
+  "name": "Right and left pinch; one placement; rejected near miss",
+  "actions": [
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "fixed",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "target": "Tray_bend",
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "at": "arrival"
+            }
+          },
+          {
+            "target": "Cell_2_1",
+            "depart": {
+              "distance": 0.08
+            },
+            "approach": {
+              "distance": 0.06
+            }
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "carriedRight"
+    },
+    {
+      "screenshot": "piece-carried.png"
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "steps": [
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "m01Placed"
+    },
+    {
+      "press": "Undo"
+    },
+    {
+      "check": "emptyNoCarry"
+    },
+    {
+      "call": [
+        "xr",
+        "set-transform",
+        {
+          "device": "hand-right",
+          "anchor": "wrist",
+          "position": {
+            "x": 0.35,
+            "y": 1.0,
+            "z": -0.12
+          }
+        }
+      ]
+    },
+    {
+      "sequence": {
+        "device": "hand-left",
+        "body": "fixed",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "target": "Tray_bend",
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "at": "arrival"
+            }
+          },
+          {
+            "position": {
+              "x": -0.22,
+              "y": 1.32,
+              "z": -0.2
+            },
+            "depart": {
+              "distance": 0.08
+            }
+          },
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "emptyNoCarry"
+    },
+    {
+      "sequence": {
+        "device": "hand-left",
+        "body": "fixed",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "target": "Tray_bend",
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "at": "arrival"
+            }
+          },
+          {
+            "target": "Cell_2_1",
+            "depart": {
+              "distance": 0.08
+            },
+            "approach": {
+              "distance": 0.06
+            }
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "carriedLeft"
+    },
+    {
+      "sequence": {
+        "device": "hand-left",
+        "steps": [
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "m01Placed"
+    }
+  ]
+}

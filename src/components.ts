@@ -6,6 +6,6 @@
  */
 
 import { defineComponents } from '@iwsdk/core';
-import { Robot } from './robot-component.js';
+import { BoardItem, GameDebug, PokeCommit } from './tidekeeper-components';
 
-export default defineComponents([Robot]);
+export default defineComponents([BoardItem, GameDebug, PokeCommit]);

@@ -7,10 +7,25 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <link rel="icon" href="data:," />
-    <title>tidekeeper</title>
+    <title>Tidekeeper</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #dee9e3; color: #26484e; }
+      #entry { position: fixed; bottom: 3vh; left: 50%; transform: translateX(-50%); background: #f3e8ce; border-radius: 22px; padding: 18px 28px; text-align: center; box-shadow: 0 8px 30px #26484e33; }
+      #entry[hidden] { display: none; }
+      h1 { margin: 0; font-size: 26px; } p { margin: 7px 0 13px; font-size: 14px; }
+      #play { display: block; margin: 10px auto; padding: 14px 72px; background: #267e80; color: #fffbed; border: 0; border-radius: 14px; font-size: 22px; cursor: pointer; }
+      label { font-size: 14px; } a { color: #26484e; }
+    </style>
   </head>
   <body style="margin: 0">
     <div id="scene-container"></div>
+    <div id="entry">
+      <h1>Tidekeeper</h1>
+      <p>Carry channels. Predict the tide. Deliver a letter.</p>
+      <button id="play" disabled>Loading...</button>
+      <label><input id="ar" type="checkbox" /> Show my room (AR)</label>
+      <p>Hands: pinch or poke. Browser: click to poke.</p>
+    </div>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>

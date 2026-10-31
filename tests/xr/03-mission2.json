@@ -1,0 +1,57 @@
+{
+  "name": "Mission 2 entirely by hand pokes",
+  "actions": [
+    {
+      "press": "Next"
+    },
+    {
+      "place": [
+        "bend",
+        1,
+        0,
+        2
+      ]
+    },
+    {
+      "place": [
+        "bend",
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "place": [
+        "straight",
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "place": [
+        "straight",
+        1,
+        2,
+        1
+      ]
+    },
+    {
+      "place": [
+        "straight",
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "check": "successM02"
+    }
+  ]
+}

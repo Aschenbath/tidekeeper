@@ -1,0 +1,84 @@
+{
+  "name": "Enter AR with hands; board placement and world lock",
+  "actions": [
+    {
+      "call": [
+        "browser",
+        "reload",
+        {}
+      ]
+    },
+    {
+      "call": [
+        "browser",
+        "interact",
+        {
+          "steps": [
+            {
+              "action": "wait",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              },
+              "state": "enabled",
+              "timeoutMs": 10000
+            },
+            {
+              "action": "click",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              }
+            },
+            {
+              "action": "wait",
+              "durationMs": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "call": [
+        "xr",
+        "set-input-mode",
+        {
+          "mode": "hand"
+        }
+      ]
+    },
+    {
+      "check": "entry"
+    },
+    {
+      "screenshot": "board-entry.png"
+    },
+    {
+      "call": [
+        "xr",
+        "set-transform",
+        {
+          "device": "headset",
+          "orientation": {
+            "yaw": 30
+          }
+        }
+      ]
+    },
+    {
+      "check": "worldLocked"
+    },
+    {
+      "call": [
+        "xr",
+        "set-transform",
+        {
+          "device": "headset",
+          "orientation": {
+            "yaw": 0
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "name": "Mission 3 preview aground, launch agrees, undo, hand-only success",
+  "actions": [
+    {
+      "press": "Next"
+    },
+    {
+      "place": [
+        "straight",
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "place": [
+        "straight",
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "press": "TideForward"
+    },
+    {
+      "press": "TideForward"
+    },
+    {
+      "press": "TideForward"
+    },
+    {
+      "check": "agroundPreview"
+    },
+    {
+      "screenshot": "preview-failure-m03.png"
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 2.2
+    },
+    {
+      "check": "agroundLaunch"
+    },
+    {
+      "press": "FailureUndo"
+    },
+    {
+      "check": "undoAground"
+    },
+    {
+      "press": "Restart"
+    },
+    {
+      "place": [
+        "bend",
+        1,
+        1,
+        3
+      ]
+    },
+    {
+      "place": [
+        "bend",
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "place": [
+        "bend",
+        2,
+        0,
+        2
+      ]
+    },
+    {
+      "place": [
+        "bend",
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "check": "successM03"
+    }
+  ]
+}

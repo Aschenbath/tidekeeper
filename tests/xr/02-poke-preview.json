@@ -1,0 +1,121 @@
+{
+  "name": "One-hand poke select/place/rotate; preview; pause/stop; mission 1 success",
+  "actions": [
+    {
+      "call": [
+        "xr",
+        "set-transform",
+        {
+          "device": "hand-left",
+          "anchor": "wrist",
+          "position": {
+            "x": -0.35,
+            "y": 1.0,
+            "z": -0.12
+          }
+        }
+      ]
+    },
+    {
+      "press": "Undo"
+    },
+    {
+      "press": "Tray_bend"
+    },
+    {
+      "check": "selectedBend"
+    },
+    {
+      "press": "Cell_2_1"
+    },
+    {
+      "check": "m01Placed"
+    },
+    {
+      "press": "Piece_2_1"
+    },
+    {
+      "check": "rotated"
+    },
+    {
+      "press": "Undo"
+    },
+    {
+      "press": "TideForward"
+    },
+    {
+      "press": "TideForward"
+    },
+    {
+      "check": "preview"
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "auto",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "target": "TideDial",
+            "offset": {
+              "x": 0.025,
+              "y": 0,
+              "z": 0
+            },
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "at": "arrival"
+            }
+          },
+          {
+            "target": "TideDial",
+            "offset": {
+              "x": 0.03,
+              "y": 0,
+              "z": 0.02
+            },
+            "duration": 0.35
+          },
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "dialPreview"
+    },
+    {
+      "presses": [
+        "Launch",
+        "Pause"
+      ]
+    },
+    {
+      "check": "paused"
+    },
+    {
+      "press": "Stop"
+    },
+    {
+      "check": "stopped"
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 3
+    },
+    {
+      "check": "successM01"
+    },
+    {
+      "screenshot": "success-m01.png"
+    }
+  ]
+}

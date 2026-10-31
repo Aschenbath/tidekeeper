@@ -7,13 +7,16 @@
 
 import { World } from '@iwsdk/core';
 import projectOptions from 'virtual:iwsdk-project';
-import { PanelSystem } from './panel.js';
-import { RobotSystem } from './robot.js';
+import { TidekeeperSystem } from './systems/tidekeeper';
+import { LocalHandVisual, LocalControllerVisual } from './systems/local-hands';
 
 World.create(
   document.getElementById('scene-container') as HTMLDivElement,
   projectOptions,
 ).then((world) => {
-  world.registerSystem(RobotSystem);
-  world.registerSystem(PanelSystem);
+  world.input.xr.visualAdapters.hand.left.updateVisualImplementation(LocalHandVisual);
+  world.input.xr.visualAdapters.hand.right.updateVisualImplementation(LocalHandVisual);
+  world.input.xr.visualAdapters.controller.left.updateVisualImplementation(LocalControllerVisual);
+  world.input.xr.visualAdapters.controller.right.updateVisualImplementation(LocalControllerVisual);
+  world.registerSystem(TidekeeperSystem);
 });

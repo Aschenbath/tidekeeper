@@ -1,0 +1,187 @@
+{
+  "name": "Tracking loss while carrying; lock wait; hold removal; reach/move; mission 4",
+  "actions": [
+    {
+      "press": "Next"
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "auto",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "target": "Tray_lock",
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "at": "arrival"
+            }
+          },
+          {
+            "target": "Cell_1_1",
+            "depart": {
+              "distance": 0.08
+            },
+            "approach": {
+              "distance": 0.06
+            }
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "carriedLock"
+    },
+    {
+      "call": [
+        "xr",
+        "set-connected",
+        {
+          "device": "hand-right",
+          "connected": false
+        }
+      ]
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "check": "trackingRecovered"
+    },
+    {
+      "call": [
+        "xr",
+        "set-connected",
+        {
+          "device": "hand-right",
+          "connected": true
+        }
+      ]
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "steps": [
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "place": [
+        "lock",
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "press": "Piece_1_1"
+    },
+    {
+      "check": "lockWait2"
+    },
+    {
+      "place": [
+        "straight",
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "auto",
+        "gaze": "fixed",
+        "steps": [
+          {
+            "label": "hover",
+            "target": {
+              "name": "Piece_2_1",
+              "face": "top"
+            },
+            "offset": {
+              "normal": 0.03
+            },
+            "anchor": "index-tip",
+            "poseId": "point"
+          },
+          {
+            "label": "touch",
+            "target": {
+              "name": "Piece_2_1",
+              "face": "top"
+            },
+            "offset": {
+              "normal": -0.008
+            },
+            "duration": 0.12
+          },
+          {
+            "label": "dwell",
+            "duration": 0.75
+          },
+          {
+            "label": "lift",
+            "target": {
+              "name": "Cell_2_1",
+              "face": "top"
+            },
+            "offset": {
+              "normal": 0.05
+            },
+            "duration": 0.15
+          }
+        ],
+        "idleHand": "keep"
+      }
+    },
+    {
+      "check": "holdRemoved"
+    },
+    {
+      "press": "Undo"
+    },
+    {
+      "press": "Reach"
+    },
+    {
+      "check": "farReach"
+    },
+    {
+      "press": "Reach"
+    },
+    {
+      "press": "Move"
+    },
+    {
+      "press": "MoveRight"
+    },
+    {
+      "check": "movedBoard"
+    },
+    {
+      "press": "MoveLeft"
+    },
+    {
+      "press": "Move"
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "check": "successM04"
+    }
+  ]
+}
