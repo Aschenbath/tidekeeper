@@ -111,6 +111,12 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
               }
               if (action.check==='preview') assert(s.tick===2,'Poke dial did not step to tick 2');
               else assert(s.tick!==2,'Pinch dial did not scrub'); previewFrames=s.frames; break;
+            // A long dial turn toward the card beside the board keeps its grab (the trailer capture once lost it there).
+            case 'dialSweptHeld': {
+              const held = await call('ecs','find',{withComponents:['Grabbed']});
+              assert(held.entities?.some(e => e.name === 'TideDial'),'The dial grab dropped mid-turn');
+              assert(s.tick > 0,'Dial sweep left the tide at tick 0'); break;
+            }
             case 'paused': assert(s.phase==='paused','Pause failed'); baseline=s.placements; break;
             case 'stopped': assert(s.phase==='editing' && s.tick===0 && same(s.placements,baseline),'Stop changed board'); break;
             case 'successM01': assert(s.mission==='m01' && s.phase==='success' && s.stars===3,'Mission 1 not mastered'); assert(same(s.frames,previewFrames),'Launch did not use preview frames'); break;

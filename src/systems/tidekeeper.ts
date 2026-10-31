@@ -33,6 +33,7 @@ export class TidekeeperSystem extends createSystem({
   private terrain!: Object3D;
   private water!: Mesh;
   private panel!: UIKitMLAsset;
+  private panelEntity!: Entity;
   private coach!: UIKitMLAsset;
   private grab!: GrabSystem;
   private sound = new Sound();
@@ -84,6 +85,7 @@ export class TidekeeperSystem extends createSystem({
     if (Object.keys(this.campaign.progress.missions).length) this.view = 'map';
     this.root = this.world.requireSceneEntity('board-root');
     this.panel = this.world.requireSceneObject<UIKitMLAsset>('game-panel');
+    this.panelEntity = this.world.requireSceneEntity('game-panel');
     this.coach = this.world.requireSceneObject<UIKitMLAsset>('coach-panel');
     this.terrain = this.world.requireSceneObject('archipelago');
     this.grab = this.world.getSystem(GrabSystem)!;
@@ -456,6 +458,13 @@ export class TidekeeperSystem extends createSystem({
     (this.water.material as ShaderMaterial).uniforms.time.value = time;
     if (this.game.advance(delta)) this.queueUI();
     for (const slot of TOUCHES) this.touchQuiet[slot] = Math.min(1, this.touchQuiet[slot] + delta);
+    // A hand turning the dial sweeps toward the card beside it. If the card stays touchable, the SDK hands that hand's near
+    // pointer to the card and drops the grab mid-turn, so the card stops taking input while anything is held.
+    const holding = this.queries.held.entities.size > 0;
+    if (holding === this.panelEntity.hasComponent(PokeInteractable)) {
+      if (holding) this.panelEntity.removeComponent(PokeInteractable).removeComponent(RayInteractable);
+      else this.panelEntity.addComponent(RayInteractable).addComponent(PokeInteractable);
+    }
     for (const e of this.queries.pokeCommits.entities) {
       if (e.hasComponent(Grabbed)) continue;
       e.removeComponent(PokeCommit); this.poke(e);

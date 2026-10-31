@@ -1,5 +1,5 @@
 {
-  "name": "Mission 3 preview aground, launch agrees, undo, hand-only success",
+  "name": "Mission 3 preview aground, dial turn toward the card, launch agrees, undo, hand-only success",
   "actions": [
     {
       "press": "Next"
@@ -34,6 +34,77 @@
     },
     {
       "screenshot": "preview-failure-m03.png"
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "auto",
+        "gaze": "fixed",
+        "idleHand": "keep",
+        "steps": [
+          {
+            "position": {
+              "x": 0.215,
+              "y": 1.42,
+              "z": -0.445
+            },
+            "anchor": "grasp",
+            "duration": 0.6
+          },
+          {
+            "target": "TideDial",
+            "poseId": "default",
+            "offset": {
+              "x": 0.025,
+              "y": 0.012,
+              "z": 0
+            },
+            "approach": {
+              "distance": 0.06
+            },
+            "pinch": {
+              "value": 1,
+              "start": 0.1,
+              "end": 0.4
+            },
+            "duration": 1.2
+          },
+          {
+            "position": {
+              "x": 0.225,
+              "y": 1.29,
+              "z": -0.485
+            },
+            "anchor": "grasp",
+            "duration": 1.4
+          },
+          {
+            "position": {
+              "x": 0.28,
+              "y": 1.3,
+              "z": -0.36
+            },
+            "duration": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "check": "dialSweptHeld"
+    },
+    {
+      "sequence": {
+        "device": "hand-right",
+        "body": "auto",
+        "gaze": "fixed",
+        "idleHand": "keep",
+        "steps": [
+          {
+            "pinch": 0,
+            "duration": 0.15
+          }
+        ]
+      }
     },
     {
       "press": "Launch"

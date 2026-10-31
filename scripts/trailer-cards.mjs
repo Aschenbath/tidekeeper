@@ -9,7 +9,7 @@ const cards = [
   ['card-launch', '03 / LAUNCH', 'The same plan.<br>The same result.', 'The preview and the run use the same simulation.<br>A dry sandbar in the preview is a dry sandbar at launch.', 'FIRST FIVE MINUTES'],
   ['card-campaign', 'THE ARCHIPELAGO', 'Nine villages.<br>One lighthouse.', 'Learn shapes, tides, locks and crossings.<br>Every delivery lights another village.', 'CAMPAIGN'],
   ['card-daily', 'DAILY TIDE', 'A new tide.<br>A reason to return.', 'A date-seeded puzzle, checked for a working solution.<br>Keep your streak and improve your best.', 'DAILY PUZZLE'],
-  ['card-accessibility', 'MADE FOR YOUR HANDS', 'A calmer way<br>to play.', 'One hand · Either hand · Poke mode<br>Sail shapes, not colour · Sound optional', 'ACCESSIBILITY'],
+  ['card-accessibility', 'MADE FOR YOUR HANDS', 'A calmer way<br>to play.', 'One hand · Either hand · Poke mode · Seated reach<br>Shape emblems, not colour · Sound optional', 'ACCESSIBILITY'],
   ['card-closing', 'TIDEKEEPER', 'Plan the tide.<br>Light the islands.', 'Recorded in the IWSDK emulator; not yet tested on a physical Quest.<br>Built with AI assistance (OpenAI Codex, Anthropic Claude Code).', 'EMULATOR CAPTURE · NO PHYSICAL HEADSET TEST YET'],
 ];
 function html([, eyebrow, title, body, footer]) {
