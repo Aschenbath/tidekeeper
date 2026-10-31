@@ -25,7 +25,7 @@ Object.assign(report, {
   format: 1, date, origin, resolution: [1920, 1080], audio: 'silent',
   disclosure: 'Recorded in the IWSDK emulator; not yet tested on a physical Quest. Built with AI assistance (OpenAI Codex, Anthropic Claude Code).',
   fixtures: 'Fresh save for flow. Later stages seed preceding campaign unlocks, then select menus and launch with emulated hands. GameDebug prepares specified boards. Daily earns a real one-day streak at a fixed capture date. No mission or rule changes.',
-  framing: { headset: [0.23, 1.78, -0.02], lookAt: [0.23, 1.32, -0.48], verticalFov: 56, stereo: false, environment: 'sunlit_living_room', panel: 'Shipped layout: the mission card beside the board, right-hand side.' },
+  framing: { headset: [0.25, 1.82, 0.04], lookAt: [0.25, 1.3, -0.46], verticalFov: 62, stereo: false, environment: 'sunlit_living_room', panel: 'Shipped layout: the mission card beside the board, right-hand side.' },
 });
 function saveReport() { writeFileSync(`${reportPath}.tmp`, JSON.stringify(report, null, 2) + '\n'); renameSync(`${reportPath}.tmp`, reportPath); }
 function assert(ok, message) { if (!ok) throw Error(message); }
@@ -127,14 +127,14 @@ async function captureStage(name) {
     await page.goto(origin, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Play', exact: true }).click();
     await page.waitForFunction(() => window.__tidekeeper && window.IWER_DEVICE?.activeSession);
-    await remote('set_device_state', { state: { inputMode: 'hand', stereoEnabled: false, fov: 56 } });
+    await remote('set_device_state', { state: { inputMode: 'hand', stereoEnabled: false, fov: 62 } });
     await page.evaluate(() => {
       const ui = window.IWER_DEVICE.devui;
       if (ui) { ui.devUIContainer.style.display = 'none'; ui.render = () => {}; }
       if (!window.__tidekeeper) throw Error('Capture requires the dev-only GameDebug surface');
     });
-    await remote('set_transform', { device: 'headset', position: { x: 0.23, y: 1.78, z: -0.02 } });
-    await remote('look_at', { device: 'headset', target: { x: 0.23, y: 1.32, z: -0.48 } });
+    await remote('set_transform', { device: 'headset', position: { x: 0.25, y: 1.82, z: 0.04 } });
+    await remote('look_at', { device: 'headset', target: { x: 0.25, y: 1.3, z: -0.46 } });
     camera = await remote('get_transform', { device: 'headset' });
     for (const side of ['left', 'right']) await remote('set_transform', { device: `hand-${side}`, anchor: 'wrist', position: { x: side === 'left' ? -0.4 : 0.4, y: 1.05, z: 0.35 } });
     await setup({ autoAdvance: false }); await wait(1200);
@@ -209,7 +209,7 @@ async function captureStage(name) {
       });
       await sequence([{ pinch: 0, duration: 0.3 }]); await wait(150);
       entry.releaseTick = (await state()).tick;
-      camera = heroCamera; await remote('set_device_state', { state: { fov: 56 } }); await park();
+      camera = heroCamera; await remote('set_device_state', { state: { fov: 62 } }); await park();
       // Use the real one-hand step controls to select the exact failure tick for the still and launch.
       for (let n = 0; n < 12 && (await state()).tick !== 3; n++) await press((await state()).tick < 3 ? 'TideForward' : 'TideBack');
       await park();
