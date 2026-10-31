@@ -11,10 +11,18 @@ export function cli(domain, action, input, extra = []) {
   const args = [binary, domain, action];
   if (input !== undefined) args.push('--input-json', JSON.stringify(input));
   args.push(...extra);
-  const output = execFileSync(process.execPath, args, { cwd: project, encoding: 'utf8', timeout: 180_000, maxBuffer: 16_000_000 });
-  const result = JSON.parse(output);
-  if (result.ok === false || result.success === false) throw new Error(JSON.stringify(result));
-  return result.data ?? result;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const output = execFileSync(process.execPath, args, { cwd: project, encoding: 'utf8', timeout: 60_000, maxBuffer: 16_000_000, windowsHide: true, stdio: ['ignore','pipe','pipe'] });
+      const result = JSON.parse(output);
+      if (result.ok === false || result.success === false) throw new Error(JSON.stringify(result));
+      return result.data ?? result;
+    } catch (error) {
+      const message = String(error.stderr || error.message);
+      if (attempt === 0 && /EPERM|Owner probe timed out/i.test(message)) continue;
+      throw new Error(message);
+    }
+  }
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [domain, action, inputFile, ...extra] = process.argv.slice(2);

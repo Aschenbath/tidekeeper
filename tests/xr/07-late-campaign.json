@@ -1,0 +1,56 @@
+{
+  "name": "Missions 6-8 complete with hand launch",
+  "actions": [
+    {
+      "press": "Mission6"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 8
+    },
+    {
+      "check": "successM06"
+    },
+    {
+      "press": "Next"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 10
+    },
+    {
+      "check": "successM07"
+    },
+    {
+      "press": "Next"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 10
+    },
+    {
+      "check": "successM08"
+    }
+  ]
+}

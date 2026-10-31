@@ -7,7 +7,7 @@
 
 import { AssetType, defineAssets } from '@iwsdk/core';
 import { MISSIONS } from './game/missions';
-import { createBoard, createBoat, createCell, createPiece, createDial, createHandle, createFailureMarker, createHandJoints } from './scene-assets/tidekeeper.scene-asset';
+import { createBoard, createBoat, createCell, createPiece, createDial, createHandle, createFailureMarker, createHandJoints, createLighthouse, createMapVillage, createStar, createRipple } from './scene-assets/tidekeeper.scene-asset';
 
 export default defineAssets({
   ...Object.fromEntries(MISSIONS.map(m => [`board-${m.id}`, createBoard(m)])),
@@ -16,6 +16,9 @@ export default defineAssets({
   'piece-lock': createPiece('lock'),
   'boat-circle': createBoat('circle'),
   'boat-triangle': createBoat('triangle'),
+  'boat-square': createBoat('square'),
+  'boat-diamond': createBoat('diamond'),
+  'map-village': createMapVillage(), lighthouse: createLighthouse(), star: createStar(), ripple: createRipple(),
   cell: createCell(), dial: createDial(), handle: createHandle(), failure: createFailureMarker(),
   'hand-joints': createHandJoints(),
   'hand-rig': { url: `${import.meta.env.BASE_URL}models/hand-rig.gltf`, type: AssetType.GLTF },

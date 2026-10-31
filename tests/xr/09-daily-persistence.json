@@ -1,0 +1,156 @@
+{
+  "name": "Daily result and streak; reload keeps settings; confirmed reset",
+  "actions": [
+    {
+      "press": "Map"
+    },
+    {
+      "press": "Daily"
+    },
+    {
+      "check": "dailyLoaded"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 16
+    },
+    {
+      "check": "dailyRecorded"
+    },
+    {
+      "screenshot": "daily-tide-streak.png"
+    },
+    {
+      "press": "Sound"
+    },
+    {
+      "check": "soundOff"
+    },
+    {
+      "call": [
+        "browser",
+        "reload",
+        {}
+      ]
+    },
+    {
+      "call": [
+        "browser",
+        "interact",
+        {
+          "steps": [
+            {
+              "action": "wait",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              },
+              "state": "enabled",
+              "timeoutMs": 10000
+            },
+            {
+              "action": "click",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              }
+            },
+            {
+              "action": "wait",
+              "durationMs": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "call": [
+        "xr",
+        "set-input-mode",
+        {
+          "mode": "hand"
+        }
+      ]
+    },
+    {
+      "check": "persisted"
+    },
+    {
+      "press": "Settings"
+    },
+    {
+      "press": "ResetProgress"
+    },
+    {
+      "press": "CancelReset"
+    },
+    {
+      "check": "resetCancelled"
+    },
+    {
+      "press": "ResetProgress"
+    },
+    {
+      "press": "ConfirmReset"
+    },
+    {
+      "check": "reset"
+    },
+    {
+      "call": [
+        "browser",
+        "reload",
+        {}
+      ]
+    },
+    {
+      "call": [
+        "browser",
+        "interact",
+        {
+          "steps": [
+            {
+              "action": "wait",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              },
+              "state": "enabled",
+              "timeoutMs": 10000
+            },
+            {
+              "action": "click",
+              "locator": {
+                "role": "button",
+                "name": "Play"
+              }
+            },
+            {
+              "action": "wait",
+              "durationMs": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "call": [
+        "xr",
+        "set-input-mode",
+        {
+          "mode": "hand"
+        }
+      ]
+    },
+    {
+      "check": "reset"
+    }
+  ]
+}

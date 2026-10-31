@@ -12,6 +12,9 @@
     "reference:warmup": "iwsdk reference warmup",
     "typecheck": "tsc --noEmit",
     "build": "vite build",
+    "build:pages": "vite build --base=/tidekeeper/",
+    "test:xr": "node scripts/xr-accept.mjs",
+    "test:production": "node scripts/production-smoke.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },

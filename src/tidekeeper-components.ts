@@ -16,8 +16,9 @@ export const BoardItem = createComponent('BoardItem', {
   hand: { type: Types.String, default: '' },
 });
 
-/** Populated only in development, to observe real input without a mutation API. */
+/** Dev-only observation and scenario setup. Commands cannot launch boats. */
 export const GameDebug = createComponent('GameDebug', {
   state: { type: Types.String, default: '{}' },
+  command: { type: Types.String, default: '' },
 });
 export const PokeCommit = createComponent('PokeCommit', {});

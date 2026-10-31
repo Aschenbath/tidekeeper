@@ -1,0 +1,37 @@
+{
+  "name": "All 42 finale cells at far reach; m09 hand launch and lighthouse",
+  "actions": [
+    {
+      "press": "Next"
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "press": "Reach"
+    },
+    {
+      "check": "farReach"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "reachGrid": true
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 14
+    },
+    {
+      "check": "successM09"
+    },
+    {
+      "screenshot": "m09-lighthouse-success.png"
+    }
+  ]
+}

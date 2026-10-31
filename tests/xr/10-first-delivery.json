@@ -1,0 +1,32 @@
+{
+  "name": "Fresh first delivery under 50 seconds; automatic mission 2",
+  "actions": [
+    {
+      "setup": {
+        "reset": true,
+        "autoAdvance": true
+      }
+    },
+    {
+      "press": "Tray_bend"
+    },
+    {
+      "press": "Cell_2_1"
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "check": "firstDelivery"
+    },
+    {
+      "wait": 3
+    },
+    {
+      "check": "autoMission2"
+    }
+  ]
+}

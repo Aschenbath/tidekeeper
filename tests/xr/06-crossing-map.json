@@ -1,0 +1,79 @@
+{
+  "name": "Crossing collision ghosts; m05 hand launch; map locks",
+  "actions": [
+    {
+      "press": "Next"
+    },
+    {
+      "setup": {
+        "board": [
+          {
+            "x": 1,
+            "y": 2,
+            "piece": "straight",
+            "rot": 1
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "piece": "straight",
+            "rot": 1
+          },
+          {
+            "x": 2,
+            "y": 1,
+            "piece": "straight",
+            "rot": 0
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "piece": "straight",
+            "rot": 0
+          }
+        ]
+      }
+    },
+    {
+      "presses": [
+        "TideForward",
+        "TideForward"
+      ]
+    },
+    {
+      "check": "crossingPreview"
+    },
+    {
+      "screenshot": "m05-crossing-collision.png"
+    },
+    {
+      "setup": {
+        "solution": true
+      }
+    },
+    {
+      "press": "Launch"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "check": "successM05"
+    },
+    {
+      "press": "Map"
+    },
+    {
+      "check": "mapLit"
+    },
+    {
+      "screenshot": "archipelago-progress.png"
+    },
+    {
+      "press": "Mission9"
+    },
+    {
+      "check": "lockedMap"
+    }
+  ]
+}

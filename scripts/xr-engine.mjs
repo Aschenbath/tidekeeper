@@ -28,6 +28,11 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
           if (action.call[0] === 'browser' && action.call[1] === 'reload') debugIndex = undefined;
           await call(...action.call);
         }
+        if (action.setup) {
+          await state();
+          await call('ecs','set-component',{entityIndex:debugIndex,componentId:'GameDebug',field:'command',value:JSON.stringify(action.setup)});
+          await call('browser','interact',{steps:[{action:'wait',durationMs:200}]});
+        }
         if (action.sequence) {
           const r = await call('xr','run-sequence',action.sequence);
           assert(r.completed && !r.cancelled, 'Incomplete hand sequence');
@@ -39,7 +44,9 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
           const r = await call('xr','run-sequence',{device:'hand-right',body:'auto',gaze:'fixed',idleHand:'keep',steps});
           assert(r.completed && !r.cancelled && r.presses?.length === steps.length, `Incomplete presses ${action.presses.join(',')}`);
         }
-        if (action.wait) await call('browser','interact',{steps:[{action:'wait',durationMs:Math.round(action.wait * 1000)}]});
+        // The CLI caps one wait step at 12 s, so long waits are split.
+        if (action.wait) for (let left = Math.round(action.wait * 1000); left > 0; left -= 12000)
+          await call('browser','interact',{steps:[{action:'wait',durationMs:Math.min(left, 12000)}]});
         if (action.screenshot) await call('browser','screenshot',undefined,['--output-file',`output/xr/${action.screenshot}`]);
         if (action.place) {
           const [piece,x,y,rot] = action.place;
@@ -52,8 +59,28 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
           }
           assert(p.rot===rot, `Rotation mismatch at ${x},${y}`);
         }
+        if (action.reachGrid) {
+          const s = await state(), steps = [], tilt = s.board.rotation[0];
+          assert(s.mission === 'm09' && s.board.reach === 'far', 'Expected the finale at far reach');
+          // Move the actual index fingertip over all 42 cell centres, including fixed and rock cells.
+          // Keep 6 cm above the board: pieces stand up to 2 cm tall and the fingertip touch range would edit them at 3 cm.
+          for (let y=0; y<6; y++) for (let x=0; x<7; x++) {
+            const px=(x-3)*0.055, pz=(y-2.5)*0.055;
+            const position={x:s.board.position[0]+px,y:s.board.position[1]+0.06*Math.cos(tilt)-pz*Math.sin(tilt),z:s.board.position[2]+0.06*Math.sin(tilt)+pz*Math.cos(tilt)};
+            steps.push({position,anchor:'index-tip',poseId:'point',duration:0.06});
+          }
+          for (let i=0;i<steps.length;i+=7) {
+            const r=await call('xr','run-sequence',{device:'hand-right',gaze:'fixed',body:'auto',idleHand:'keep',steps:steps.slice(i,i+7)});
+            assert(r.completed && !r.cancelled,'Could not reach every finale cell');
+          }
+          const after=await state(); assert(same(s.placements,after.placements),'Reach probe edited the board');
+        }
         if (action.check) {
-          const s = await state();
+          let s = await state();
+          // Headless frames are slow and uneven, so a run can outlast its scripted wait; finish it before judging.
+          for (let i = 0; i < 20 && s.phase === 'running' && /^(success|dailyRecorded|firstDelivery)/.test(action.check); i++) {
+            await call('browser','interact',{steps:[{action:'wait',durationMs:1000}]}); s = await state();
+          }
           switch (action.check) {
             case 'entry': {
               const xr = await call('xr','status'); assert(xr.sessionActive,'XR inactive');
@@ -81,6 +108,26 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
             case 'successM01': assert(s.mission==='m01' && s.phase==='success' && s.stars===3,'Mission 1 not mastered'); assert(same(s.frames,previewFrames),'Launch did not use preview frames'); break;
             case 'successM02': case 'successM03': case 'successM04':
               assert(s.mission===`m0${action.check.slice(-1)}` && s.phase==='success' && s.stars===3,`${s.mission} not mastered`); assert(s.hintsUsed===0,'Mission used hints'); break;
+            case 'successM05': case 'successM06': case 'successM07': case 'successM08': case 'successM09':
+              assert(s.mission===`m0${action.check.slice(-1)}` && s.phase==='success',`${s.mission} did not complete`);
+              assert(s.progress.missions[s.mission]?.stars > 0,'Campaign result was not saved');
+              if (action.check==='successM09') {
+                assert(s.lighthouse,'Finale did not light the lighthouse');
+                emit(`METRIC m09 renderer.info ${JSON.stringify(s.renderer)}`);
+                assert(s.renderer.calls<=100,`Draw-call budget exceeded: ${s.renderer.calls}`);
+              }
+              break;
+            case 'crossingPreview': assert(s.phase==='editing' && s.outcome.failures[0]?.kind==='collision' && s.renderedGhosts.length===2 && s.status.includes('boats'),'Crossing preview lacks collision ghosts/reason'); break;
+            case 'mapLit': assert(s.view==='map' && Object.keys(s.progress.missions).length>=5,'Map did not show saved villages'); break;
+            case 'lockedMap': assert(s.view==='map' && !s.progress.missions.m08,'Locked mission became playable'); break;
+            case 'dailyLoaded': assert(s.dailyDate===s.daily.date && s.mission===`daily-${s.daily.date}`,'Wrong daily loaded'); break;
+            case 'dailyRecorded': assert(s.phase==='success' && s.daily.best?.pieces===s.placements.length && s.daily.streak>=1,'Daily result/streak missing'); break;
+            case 'soundOff': assert(!s.progress.settings.sound,'Sound setting did not change'); break;
+            case 'persisted': assert(s.view==='map' && s.progress.missions.m09 && s.daily.best && !s.progress.settings.sound && s.progress.settings.reach==='far','Progress/settings did not survive reload'); break;
+            case 'resetCancelled': assert(s.progress.missions.m09 && s.daily.best,'Cancel erased progress'); break;
+            case 'reset': assert(s.mission==='m01' && !Object.keys(s.progress.missions).length && !Object.keys(s.progress.daily.best).length && s.progress.settings.sound && s.board.reach==='near','Reset did not clear progress/settings'); break;
+            case 'firstDelivery': assert(s.progress.missions.m01 && s.missionOneMs>0 && s.missionOneMs<=50_000,'Mission 1 exceeded 50 seconds'); emit(`METRIC mission 1 scripted ${Math.round(s.missionOneMs)} ms (includes CLI overhead)`); break;
+            case 'autoMission2': assert(s.mission==='m02' && s.phase==='editing','Mission 2 did not arrive without a menu'); break;
             case 'agroundPreview':
               assert(s.tick===3 && s.phase==='editing' && s.outcome.failures[0].kind==='aground','Expected aground preview'); assert(s.status.includes('bar is dry at tick 3'),'Missing failure reason'); previewFrames=s.frames; break;
             case 'agroundLaunch': assert(s.phase==='failure' && s.outcome.failures[0].kind==='aground' && same(s.frames,previewFrames),'Launch/preview failure differs'); break;

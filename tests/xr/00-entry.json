@@ -39,6 +39,11 @@
       ]
     },
     {
+      "setup": {
+        "reset": true
+      }
+    },
+    {
       "call": [
         "xr",
         "set-input-mode",

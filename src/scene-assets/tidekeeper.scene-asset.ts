@@ -4,6 +4,7 @@ import {
   InstancedMesh, Object3D, DoubleSide, SphereGeometry,
 } from '@iwsdk/core';
 import type { BoardPieceType, Mission, Shape as BoatShape } from '../game/types';
+import { batchStatic } from './batch';
 
 // Deterministic, Y-up, meters. Board origin is centre; grid south is +Z.
 export const CELL = 0.055;
@@ -36,14 +37,14 @@ export function createPiece(piece: BoardPieceType) {
     g.add(box('Lock gate', 0.027, 0.012, 0.005, ochre, 0, 0.014, 0));
     for (let i = 0; i < 3; i++) g.add(box(`Wait ${i + 1}`, 0.004, 0.003, 0.007, ink, 0.02, 0.01, (i - 1) * 0.009));
   }
-  return g;
+  batchStatic(g, m => m.name.startsWith('Wait ')); return g;
 }
 export function createCell() {
   const g = new Group(); g.name = 'Build square';
   g.add(box('Poke surface', CELL * 0.91, 0.003, CELL * 0.91, material(0x8dc8bc)));
   g.add(box('Build cross horizontal', 0.016, 0.001, 0.002, paper, 0, 0.004));
   g.add(box('Build cross vertical', 0.002, 0.001, 0.016, paper, 0, 0.004));
-  return g;
+  batchStatic(g); return g;
 }
 export function createEmblem(shape: BoatShape) {
   const geo = shape === 'circle' || shape === 'triangle'
@@ -66,26 +67,30 @@ export function createBoat(shape: BoatShape) {
   const sailMesh = mesh('White sail', new ExtrudeGeometry(cloth, { depth: 0.001, bevelEnabled: false }), sailMat);
   sailMesh.position.set(0.001, 0.013, 0); g.add(sailMesh);
   const symbol = createEmblem(shape); symbol.rotation.x = Math.PI / 2; symbol.position.set(0.008, 0.023, 0.0015); g.add(symbol);
-  return g;
+  batchStatic(g); return g;
 }
 export function createDial() {
   const g = new Group(); g.name = 'Tide dial';
   const ring = mesh('Pinch ring', new TorusGeometry(0.028, 0.006, 8, 32), ochre); ring.rotation.x = Math.PI / 2; ring.position.y = 0.012; g.add(ring);
-  g.add(box('Dial pointer', 0.008, 0.007, 0.014, paper, 0, 0.012, -0.028)); return g;
+  g.add(box('Dial pointer', 0.008, 0.007, 0.014, paper, 0, 0.012, -0.028)); batchStatic(g); return g;
 }
 export function createHandle() {
   const g = new Group(); g.name = 'Move board'; g.add(box('Handle', 0.072, 0.008, 0.026, ochre)); return g;
 }
 export function createHandJoints() {
   const g = new Group(); g.name = 'Local hand joints';
-  const joints = new InstancedMesh(new SphereGeometry(0.006, 6, 4), paper, 25);
-  joints.name = 'Tracked joints'; g.add(joints); return g;
+  const skin = material(0xe5c6a0);
+  const joints = new InstancedMesh(new SphereGeometry(0.005, 8, 6), skin, 25);
+  const bones = new InstancedMesh(new CylinderGeometry(0.004, 0.005, 1, 8), skin, 24);
+  const palm = mesh('Palm', new SphereGeometry(1, 12, 8), skin);
+  joints.name = 'Tracked joints'; bones.name = 'Finger bones';
+  g.add(joints, bones, palm); return g;
 }
 export function createFailureMarker() {
   const g = new Group(); g.name = 'Failure marker';
   const red = material(palette.red); red.emissive.setHex(0x5e0804);
   const a = box('Cross left', 0.038, 0.007, 0.007, red); a.rotation.y = Math.PI / 4;
-  const b = a.clone(); b.name = 'Cross right'; b.rotation.y = -Math.PI / 4; g.add(a, b); return g;
+  const b = a.clone(); b.name = 'Cross right'; b.rotation.y = -Math.PI / 4; g.add(a, b); batchStatic(g); return g;
 }
 export function createBoard(mission: Mission) {
   const root = new Group(); root.name = `Archipelago ${mission.id}`;
@@ -130,5 +135,48 @@ export function createBoard(mission: Mission) {
     }
     village.add(homes, roofs, lights); root.add(village);
   });
+  if (mission.id === 'm09') {
+    const lighthouse = createLighthouse(); lighthouse.position.set(0, 0, -mission.height * CELL / 2 - 0.007); root.add(lighthouse);
+  }
+  batchStatic(root, m => m.name === 'Windows' || m.name.startsWith('Bar ') || m.name === 'Beacon');
   return root;
+}
+
+/** Tabletop lighthouse: Y up; base on Y=0, 10 cm tall, 4 cm footprint. */
+export function createLighthouse() {
+  const g = new Group(); g.name = 'Lighthouse';
+  const tower = mesh('Tapered tower', new CylinderGeometry(0.013, 0.021, 0.071, 12), paper); tower.position.y = 0.0355;
+  const cap = mesh('Lantern roof', new ConeGeometry(0.023, 0.018, 12), ochre); cap.position.y = 0.095;
+  const beacon = mesh('Beacon', new CylinderGeometry(0.015, 0.015, 0.016, 12), ink); beacon.position.y = 0.079;
+  g.add(tower, cap, beacon); return g;
+}
+
+/** Nine village buttons share this 8 cm island; number/name labels live in UIKit. */
+export function createMapVillage() {
+  const g = new Group(); g.name = 'Village island';
+  const island = mesh('Sand island', new CylinderGeometry(0.039, 0.034, 0.01, 16), sand); island.scale.z = 0.8; g.add(island);
+  const lights = new InstancedMesh(new BoxGeometry(0.007, 0.007, 0.001), ink, 3); lights.name = 'Window';
+  const transform = new Object3D();
+  for (let i = 0; i < 3; i++) {
+    g.add(box('Home', 0.016, 0.018, 0.016, paper, (i - 1) * 0.021, 0.014, 0));
+    const roof = mesh('Roof', new ConeGeometry(0.015, 0.012, 4), ochre); roof.position.set((i - 1) * 0.021, 0.029, 0); roof.rotation.y = Math.PI / 4; g.add(roof);
+    transform.position.set((i - 1) * 0.021, 0.016, 0.0085); transform.updateMatrix(); lights.setMatrixAt(i, transform.matrix);
+  }
+  g.add(lights);
+  batchStatic(g, m => m.name === 'Window'); return g;
+}
+
+export function createStar() {
+  const shape = new Shape();
+  for (let i = 0; i < 10; i++) {
+    const angle = i * Math.PI / 5, r = i % 2 ? 0.007 : 0.016;
+    if (i === 0) shape.moveTo(0, r); else shape.lineTo(Math.sin(angle) * r, Math.cos(angle) * r);
+  }
+  shape.closePath(); const star = mesh('Mastery star', new ExtrudeGeometry(shape, { depth: 0.003, bevelEnabled: false }), ochre);
+  star.rotation.x = -Math.PI / 2; return star;
+}
+
+export function createRipple() {
+  const ring = mesh('Delivery ripple', new TorusGeometry(0.022, 0.0015, 4, 24), ochre);
+  ring.rotation.x = Math.PI / 2; return ring;
 }
