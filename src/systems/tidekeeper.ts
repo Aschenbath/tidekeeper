@@ -503,7 +503,8 @@ export class TidekeeperSystem extends createSystem({
       if (s.mission.id === 'm01' && this.missionOneMs === null) this.missionOneMs = performance.now() - this.missionStarted;
       if (this.autoAdvance && s.mission.id === 'm01') this.resultTimer = setTimeout(() => { if (this.game === s && s.phase === 'success' && this.view === 'game') this.nextMission(); }, 2400);
     }
-    const reason = failure && s.simulation.outcome.kind === 'failure' ? s.simulation.outcome.failures.map(f => f.reason).join('; ') : '';
+    // Both boats in a collision report the same reason; say it once.
+    const reason = failure && s.simulation.outcome.kind === 'failure' ? [...new Set(s.simulation.outcome.failures.map(f => f.reason))].join('; ') : '';
     this.text('MissionTitle', this.campaign.dailyDate ? `Daily tide / ${this.campaign.dailyDate}` : `${s.missionIndex + 1} / ${s.missions.length}   ${s.mission.title}`);
     this.text('Status', reason || (phase === 'success' ? s.mission.id === 'm09' ? 'The lighthouse shines. Every village is alight!' : 'All letters delivered!' : this.message || (phase === 'running' ? 'Sailing the plan you previewed.' : phase === 'paused' ? 'Paused' : 'Poke to select / pinch to carry. Hold to remove.')));
     this.text('Goal', masteryText(s.mission)); this.text('Tick', `Tick ${s.tick} / ${s.mission.tickLimit}`);
