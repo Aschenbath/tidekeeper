@@ -17,8 +17,8 @@ describe('campaign flow', () => {
     expect(c.progress.missions.m01.stars).toBe(3);
     expect(c.next()).toBe(true); expect(c.session.mission.id).toBe('m02');
     expect(new Campaign(store).session.mission.id).toBe('m02');
-    c.settings({ reach: 'far', sound: false });
-    expect(new Campaign(store).progress.settings).toEqual({ reach: 'far', sound: false });
+    c.settings({ reach: 'far', sound: false, panel: 'left' });
+    expect(new Campaign(store).progress.settings).toEqual({ reach: 'far', sound: false, panel: 'left' });
     c.reset(); expect(JSON.parse(data.get(STORAGE_KEY)!).missions).toEqual({});
     expect(c.session.mission.id).toBe('m01'); expect(c.select(8)).toBe(false);
   });

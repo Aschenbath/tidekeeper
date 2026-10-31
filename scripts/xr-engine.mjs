@@ -44,6 +44,14 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
           const r = await call('xr','run-sequence',{device:'hand-right',body:'auto',gaze:'fixed',idleHand:'keep',steps});
           assert(r.completed && !r.cancelled && r.presses?.length === steps.length, `Incomplete presses ${action.presses.join(',')}`);
         }
+        // Seated reach: the body neither leans nor walks, so every target must be within that arm's reach.
+        if (action.seated) {
+          const [device, ...targets] = action.seated;
+          const steps = targets.map(t => ({target:/^(Tray_|Cell_|Piece_)/.test(t) ? {name:t,face:'top'} : t, press:{hold:0.07}}));
+          const r = await call('xr','run-sequence',{device,body:'fixed',gaze:'fixed',idleHand:'rest',steps});
+          assert(r.completed && !r.cancelled && r.presses?.length === steps.length, `Seated ${device} could not press ${targets.join(',')}`);
+          await call('browser','interact',{steps:[{action:'wait',durationMs:120}]});
+        }
         // The CLI caps one wait step at 12 s, so long waits are split.
         if (action.wait) for (let left = Math.round(action.wait * 1000); left > 0; left -= 12000)
           await call('browser','interact',{steps:[{action:'wait',durationMs:Math.min(left, 12000)}]});
@@ -137,6 +145,10 @@ export async function runAcceptance(call, scenarios, emit = () => {}) {
             case 'lockWait2': assert(s.placements.find(p=>p.piece==='lock')?.wait===2,'Lock tap did not cycle wait'); break;
             case 'holdRemoved': assert(s.placements.length===1 && s.placements[0].piece==='lock','Poke hold did not remove once'); break;
             case 'farReach': assert(s.board.reach==='far','Far reach did not apply'); break;
+            case 'nearReach': assert(s.board.reach==='near','Near reach did not apply'); break;
+            case 'seatedM01': assert(s.mission==='m01' && s.phase==='success','Seated hand did not complete mission 1'); break;
+            case 'panelLeft': assert(s.progress.settings.panel==='left','Panel did not move to the left'); break;
+            case 'panelRight': assert(s.progress.settings.panel==='right','Panel did not return to the right'); break;
             case 'movedBoard': assert(s.board.position[0]>0.03,'Poke move arrow did not move board'); break;
             default: throw new Error(`Unknown check ${action.check}`);
           }

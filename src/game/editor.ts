@@ -119,8 +119,8 @@ export class Editor {
     const rest = this.current.filter((p) => !(p.x === missing.x && p.y === missing.y));
     const used = rest.filter((p) => p.piece === missing.piece).length;
     if (used >= this.mission.budget[missing.piece]) {
-      // Free a piece of that type that is not part of the solution.
-      const spare = rest.find((p) => p.piece === missing.piece && !this.mission.solution.some((s) => s.x === p.x && s.y === p.y));
+      // Free a piece of that type that the solution does not want where it stands.
+      const spare = rest.find((p) => p.piece === missing.piece && !this.mission.solution.some((s) => s.x === p.x && s.y === p.y && s.piece === p.piece));
       if (!spare) return null;
       rest.splice(rest.indexOf(spare), 1);
     }

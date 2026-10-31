@@ -19,6 +19,7 @@ const PIECES: readonly PieceType[] = ['straight', 'bend', 'lock'];
 const HANDS = ['left', 'right'] as const;
 const TOUCHES = ['left', 'right', 'mouse'] as const;
 const TRAY_Z = 0.19, DIAL_X = 0.19, HANDLE_X = -0.19, HANDLE_Z = 0;
+const PANEL_X = Math.max(...MISSIONS.map(m => m.width)) * CELL / 2 + 0.043 + 0.25;
 
 export class TidekeeperSystem extends createSystem({
   items: { required: [BoardItem] },
@@ -42,6 +43,7 @@ export class TidekeeperSystem extends createSystem({
   private selected: PieceType | null = null;
   private lockCell: Placement | null = null;
   private far = false;
+  private panelLeft = false;
   private moveControls = false;
   private ready = false;
   private xrPlaced = false;
@@ -76,6 +78,7 @@ export class TidekeeperSystem extends createSystem({
   init() {
     this.campaign = new Campaign(browserStorage());
     this.far = this.campaign.progress.settings.reach === 'far';
+    this.panelLeft = this.campaign.progress.settings.panel === 'left';
     this.sound.muted = !this.campaign.progress.settings.sound;
     this.mapUnlocked = !!this.campaign.progress.missions.m05;
     if (Object.keys(this.campaign.progress.missions).length) this.view = 'map';
@@ -323,8 +326,8 @@ export class TidekeeperSystem extends createSystem({
       TideBack: () => this.scrub(this.game.tick - 1), TideForward: () => this.scrub(this.game.tick + 1),
       Reach: () => { if (this.hasCarry()) return; this.far = !this.far; this.campaign.settings({reach:this.far ? 'far' : 'near'}); this.placeBoard(); this.refresh(); },
       Move: () => { this.moveControls = !this.moveControls; this.refresh(); },
-      MoveLeft: () => { this.root.object3D!.position.x -= 0.04; }, MoveRight: () => { this.root.object3D!.position.x += 0.04; },
-      MoveUp: () => { this.root.object3D!.position.y += 0.04; }, MoveDown: () => { this.root.object3D!.position.y -= 0.04; },
+      MoveLeft: () => this.nudge(-0.04, 0), MoveRight: () => this.nudge(0.04, 0), MoveUp: () => this.nudge(0, 0.04), MoveDown: () => this.nudge(0, -0.04),
+      PanelSide: () => { if (this.hasCarry()) return; this.panelLeft = !this.panelLeft; this.campaign.settings({panel:this.panelLeft ? 'left' : 'right'}); this.layoutPanel(); this.refresh(); },
       Sound: () => { this.sound.muted = !this.sound.muted; this.campaign.settings({sound:!this.sound.muted}); this.sound.unlock(); this.refresh(); },
       RotateLock: () => { if (this.lockCell) this.changed(this.game.edit(e => e.rotate(this.lockCell!.x, this.lockCell!.y)), 'rotate'); },
       Map: () => this.openView('map'),
@@ -336,7 +339,7 @@ export class TidekeeperSystem extends createSystem({
       CancelReset: () => { this.resetConfirm = false; this.refresh(); },
       ConfirmReset: () => {
         if (!this.resetConfirm || this.hasCarry()) return;
-        this.campaign.reset(); this.far = false; this.sound.muted = false; this.resetConfirm = false;
+        this.campaign.reset(); this.far = false; this.panelLeft = false; this.sound.muted = false; this.resetConfirm = false;
         this.mapUnlocked = false; this.view = 'game'; this.createMission(); this.placeBoard(); this.refresh();
       },
     };
@@ -418,8 +421,20 @@ export class TidekeeperSystem extends createSystem({
     this.root.object3D!.position.copy(this.head).addScaledVector(this.direction, this.far ? -0.6 : -0.45);
     this.root.object3D!.position.y = this.head.y - 0.35;
     this.root.object3D!.rotation.set(Math.PI / 12, Math.atan2(this.direction.x, this.direction.z), 0);
+    this.layoutPanel();
+  }
+  /** The mission card stands beside the board, clear of the tide dial (or the move handle) on the widest board, turned
+   * toward that shoulder and only slightly tilted back, so a seated fingertip meets each button head-on instead of
+   * dragging across its neighbours. It stays put between missions, so a finger on Next never lands on another button. */
+  private layoutPanel() {
+    const side = this.panelLeft ? -1 : 1;
+    this.panel.position.set(side * PANEL_X, 0.14, 0);
+    this.panel.rotation.set(-25 * Math.PI / 180, -side * 35 * Math.PI / 180, 0, 'YXZ');
+    this.panel.scale.setScalar(0.8);
     this.panelMovedAt = this.now;
   }
+  /** The card moves with the board, so the finger still on the arrow must not press again or press a neighbour. */
+  private nudge(x: number, y: number) { this.root.object3D!.position.x += x; this.root.object3D!.position.y += y; this.panelMovedAt = this.now; }
   private scrub(tick: number) { const before = this.game.tick; this.game.scrub(tick); if (before !== this.game.tick) this.feedback('dial'); this.refresh(); }
   private queueUI() {
     if (this.uiQueued) return; this.uiQueued = true;
@@ -507,14 +522,17 @@ export class TidekeeperSystem extends createSystem({
     const reason = failure && s.simulation.outcome.kind === 'failure' ? [...new Set(s.simulation.outcome.failures.map(f => f.reason))].join('; ') : '';
     this.text('MissionTitle', this.campaign.dailyDate ? `Daily tide / ${this.campaign.dailyDate}` : `${s.missionIndex + 1} / ${s.missions.length}   ${s.mission.title}`);
     this.text('Status', reason || (phase === 'success' ? s.mission.id === 'm09' ? 'The lighthouse shines. Every village is alight!' : 'All letters delivered!' : this.message || (phase === 'running' ? 'Sailing the plan you previewed.' : phase === 'paused' ? 'Paused' : 'Poke to select / pinch to carry. Hold to remove.')));
-    this.text('Goal', masteryText(s.mission)); this.text('Tick', `Tick ${s.tick} / ${s.mission.tickLimit}`);
+    this.text('Goal', `Optional star: ${masteryText(s.mission).toLowerCase()}`); this.text('Tick', `Tick ${s.tick} / ${s.mission.tickLimit}`);
     this.panel.requireElementById('Card').setProperties({ backgroundColor: phase === 'success' ? '#c9e1b1' : failure ? '#f4c0ae' : '#f3e8ce' });
     this.show('EditControls', s.editable); this.show('Launch', s.editable); this.show('Pause', phase === 'running' || phase === 'paused'); this.text('Pause', phase === 'paused' ? 'Resume' : 'Pause');
     this.show('Stop', phase === 'running' || phase === 'paused'); this.show('Next', phase === 'success' && !this.campaign.dailyDate && s.missionIndex < s.missions.length - 1); this.show('FailureControls', phase === 'failure');
     this.show('MoveControls', this.moveControls); this.show('RotateLock', !!this.lockCell && s.editable);
-    this.text('Reach', `Reach: ${this.far ? 'far' : 'near'}`); this.text('Sound', `Sound: ${this.sound.muted ? 'off' : 'on'}`);
+    this.text('Reach', `Reach: ${this.far ? 'far' : 'near'}`); this.text('Sound', `Sound: ${this.sound.muted ? 'off' : 'on'}`); this.text('PanelSide', `Panel: ${this.panelLeft ? 'left' : 'right'} hand`);
     const coachLines = ['Pinch the bend and drop it in the glowing square.', 'Match each boat to its dock shape.', 'Turn the tide dial to see what the sea will do.', 'Tap the lock to set a two-tick wait.'];
-    this.coach.requireElementById<UIKit.Text>('CoachText').setProperties({ text: !this.campaign.dailyDate && s.missionIndex < 4 && s.editable ? coachLines[s.missionIndex] : '' });
+    // Coach the next step from the board's state: a working first board needs Launch; a failed preview needs a new route, not a later start.
+    const coachLine = s.missionIndex === 0 && s.simulation.outcome.kind === 'success' ? 'Now press Launch on the card beside the board.'
+      : failure && s.missionIndex < 4 ? 'Boats always leave at tick 0. Change the channels, then check the tide again.' : coachLines[s.missionIndex];
+    this.coach.requireElementById<UIKit.Text>('CoachText').setProperties({ text: !this.campaign.dailyDate && s.missionIndex < 4 && s.editable ? coachLine : '' });
     this.coach.position.set(0, 0.009, this.trayZ() + 0.047);
     this.coach.scale.setScalar(1);
     this.refreshNavigation();
@@ -608,7 +626,7 @@ export class TidekeeperSystem extends createSystem({
     try {
       const command = JSON.parse(json) as { reset?: boolean; autoAdvance?: boolean; solution?: boolean; board?: Placement[] };
       if (command.reset) {
-        this.campaign.reset(); this.view = 'game'; this.far = false; this.sound.muted = false; this.mapUnlocked = false;
+        this.campaign.reset(); this.view = 'game'; this.far = false; this.panelLeft = false; this.sound.muted = false; this.mapUnlocked = false;
         this.autoAdvance = false; this.missionOneMs = null; this.createMission(); this.placeBoard();
       }
       if (command.autoAdvance !== undefined) this.autoAdvance = command.autoAdvance;

@@ -13,7 +13,7 @@
       "transform": { "position": [0, 1.25, -0.45], "rotationDeg": [15, 0, 0] },
       "children": [
         { "id": "archipelago", "name": "Archipelago", "content": { "type": "asset", "asset": "board-m01" } },
-        { "id": "game-panel", "name": "Mission Card", "content": { "type": "asset", "asset": "game-panel" }, "transform": { "position": [0, 0.23, -0.32], "rotationDeg": [-40, 0, 0] }, "components": { "RayInteractable": {}, "PokeInteractable": {} } },
+        { "id": "game-panel", "name": "Mission Card", "content": { "type": "asset", "asset": "game-panel" }, "transform": { "position": [0.49, 0.14, 0], "rotationDeg": [-25, -35, 0] }, "components": { "RayInteractable": {}, "PokeInteractable": {} } },
         { "id": "coach-panel", "name": "Coach", "content": { "type": "asset", "asset": "coach-panel" }, "transform": { "position": [0, 0.008, 0.125], "rotationDeg": [-90, 0, 0] } }
       ]
     },

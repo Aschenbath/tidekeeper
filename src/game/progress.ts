@@ -7,13 +7,13 @@ export interface Progress {
   version: 1;
   missions: Record<string, MissionRecord>;
   daily: { lastSolved: string | null; streak: number; best: Record<string, { pieces: number; tick: number }> };
-  settings: { reach: "near" | "far"; sound: boolean };
+  settings: { reach: "near" | "far"; sound: boolean; panel: "right" | "left" };
 }
 
 export const STORAGE_KEY = "tidekeeper.progress.v1";
 
 export function emptyProgress(): Progress {
-  return { version: 1, missions: {}, daily: { lastSolved: null, streak: 0, best: {} }, settings: { reach: "near", sound: true } };
+  return { version: 1, missions: {}, daily: { lastSolved: null, streak: 0, best: {} }, settings: { reach: "near", sound: true, panel: "right" } };
 }
 
 const isDate = (value: unknown): value is string => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -37,6 +37,7 @@ export function parseProgress(text: string | null | undefined): Progress {
   }
   if (raw.settings?.reach === "far") p.settings.reach = "far";
   if (raw.settings?.sound === false) p.settings.sound = false;
+  if (raw.settings?.panel === "left") p.settings.panel = "left";
   return p;
 }
 

@@ -68,6 +68,7 @@
   <span class="body">Lock: tap for wait, Turn lock for direction.</span>
   <span class="body">Mouse clicks work too. No gaze required.</span>
   <span id="StorageNote" class="body">Progress saved on this device.</span>
+  <button id="PanelSide" class="button">Panel: right hand</button>
   <button id="ResetProgress" class="button">Reset progress</button>
   <div id="ResetConfirm" class="section hidden">
    <span class="body">Erase villages, daily records and settings?</span>

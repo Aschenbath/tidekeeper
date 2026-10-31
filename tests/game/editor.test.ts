@@ -77,6 +77,17 @@ describe("editor", () => {
       expect(simulate(m, editor.placements).outcome.kind).toBe("success");
     }
   });
+
+  it("hints free a piece that sits in another piece's solution slot", () => {
+    const m = byId("m02");
+    const editor = new Editor(m);
+    // Both bends where the solution wants straights: no bend is left for the hint to place.
+    editor.place(1, 2, "bend", 0); editor.place(2, 2, "bend", 0);
+    let hints = 0;
+    while (editor.hint()) hints++;
+    expect(hints).toBe(m.solution.length);
+    expect(simulate(m, editor.placements).outcome.kind).toBe("success");
+  });
 });
 
 describe("stars", () => {

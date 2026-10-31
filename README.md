@@ -2,9 +2,9 @@
 
 A seated, hands-only mixed-reality puzzle for Meta Quest 3, built with IWSDK 1.1 (WebXR).
 
-A tiny archipelago sits on your real table. Letters must reach the villages before the tide shuts the canals.
+A tiny archipelago floats in front of you at table height. Letters must reach the villages before the tide shuts the canals.
 Place channel pieces, scrub time forward to see exactly what the sea will do, then launch the boats and watch your
-plan work. Every delivery lights another village; the ninth lights the lighthouse.
+plan work. Every delivery lights another village; finishing the ninth mission lights the lighthouse.
 
 ## How to play
 
@@ -36,16 +36,17 @@ piece back. Undo, redo, restart and hints are always one press away.
 - **Deterministic rules:** a pure, tick-based simulation with no physics engine. The preview, the launch and the
   solver all run the same function, so what you predict is what happens. Failures are explicit: aground, dead end,
   collision, wrong dock, out of time.
-- **Progress:** stored locally (the game still works when storage is blocked). Settings for reach and sound; reset
+- **Progress:** stored locally (the game still works when storage is blocked). Settings for reach, panel side and sound; reset
   with a confirm step.
 
 ## Accessibility
 
 - Everything works one-handed with either hand. Poke mode needs no pinch at all.
 - No fast or two-handed gestures, no gaze requirement. Large buttons with visible press depth; each press fires once.
-- Boats are told apart by sail shape (circle, triangle, square, diamond), never by colour alone.
+- Boats and docks carry matching shape emblems (circle, triangle, square, diamond), never colour alone.
 - Every sound has a visual equivalent, and sound can be turned off.
-- Reach (near/far) and a move control let a seated player bring the board within reach.
+- The mission card stands beside the board, within seated reach of that hand; Settings moves it to the left for
+  left-handed play. Reach (near/far) and a move control adjust the board.
 
 ## Tech
 
@@ -70,15 +71,15 @@ npm run test:xr             # writes output/xr/acceptance.txt and screenshots
 ```
 
 The scenarios in `tests/xr/` drive simulated hands (poke, pinch, carry, tracking loss, hold-to-remove) through the
-real game. Dev-only helpers may set up a board, but every launch is pressed by a hand. The debug surface is not in
+real game. `11-seated-reach` fixes the emulator's body (no lean, no walking) and plays mission 1, switches the panel
+side and toggles reach with each hand, so an out-of-reach control fails the run. Dev-only helpers may set up a board, but every launch is pressed by a hand. The debug surface is not in
 production builds.
 
 ## Submission capture
 
 `node scripts/trailer.mjs` records the video footage and gallery stills from real IWER hand input against the running
-dev server; `bash ../media/assemble.sh` cuts them into a silent 2:22 1920×1080 video. For a readable 16:9 frame it
-uses a downward head pose and, in its own browser only, moves the mission panel beside the board through the DEV-only
-debug surface. Later missions start from seeded progress and `GameDebug` boards, but every launch is pressed by a hand.
+dev server; `bash ../media/assemble.sh` cuts them into a silent 1920×1080 video. For a readable 16:9 frame it
+uses a downward head pose; the layout is the shipped one. Later missions start from seeded progress and `GameDebug` boards, but every launch is pressed by a hand.
 Each run writes a manifest of hand events and state checks. Stages can be rerun with `--only=<stage>`; see the header
 of `scripts/trailer.mjs` for options.
 

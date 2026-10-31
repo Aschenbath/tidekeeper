@@ -25,7 +25,7 @@ Object.assign(report, {
   format: 1, date, origin, resolution: [1920, 1080], audio: 'silent',
   disclosure: 'Recorded in the IWSDK emulator; not yet tested on a physical Quest. Built with AI assistance (OpenAI Codex, Anthropic Claude Code).',
   fixtures: 'Fresh save for flow. Later stages seed preceding campaign unlocks, then select menus and launch with emulated hands. GameDebug prepares specified boards. Daily earns a real one-day streak at a fixed capture date. No mission or rule changes.',
-  framing: { headset: [0.23, 1.78, -0.02], lookAt: [0.23, 1.32, -0.48], verticalFov: 56, stereo: false, environment: 'sunlit_living_room', panel: 'Existing mission panel placed beside the board in this dev-only capture session; shipped layout unchanged.' },
+  framing: { headset: [0.23, 1.78, -0.02], lookAt: [0.23, 1.32, -0.48], verticalFov: 56, stereo: false, environment: 'sunlit_living_room', panel: 'Shipped layout: the mission card beside the board, right-hand side.' },
 });
 function saveReport() { writeFileSync(`${reportPath}.tmp`, JSON.stringify(report, null, 2) + '\n'); renameSync(`${reportPath}.tmp`, reportPath); }
 function assert(ok, message) { if (!ok) throw Error(message); }
@@ -131,11 +131,7 @@ async function captureStage(name) {
     await page.evaluate(() => {
       const ui = window.IWER_DEVICE.devui;
       if (ui) { ui.devUIContainer.style.display = 'none'; ui.render = () => {}; }
-      // Existing DEV-only runtime hook. This changes presentation in this disposable page only.
-      if (!window.__tidekeeper) throw Error('Capture layout requires the dev-only GameDebug surface');
-      const panel = window.FRAMEWORK_MCP_RUNTIME.world.requireSceneObject('game-panel');
-      panel.position.set(0.49, 0.12, 0);
-      panel.rotation.set(-70 * Math.PI / 180, 0, 0);
+      if (!window.__tidekeeper) throw Error('Capture requires the dev-only GameDebug surface');
     });
     await remote('set_transform', { device: 'headset', position: { x: 0.23, y: 1.78, z: -0.02 } });
     await remote('look_at', { device: 'headset', target: { x: 0.23, y: 1.32, z: -0.48 } });
@@ -174,14 +170,13 @@ async function captureStage(name) {
       await press('Mission3'); await park();
       check((await state()).view === 'game', 'Mission 3 stays in game view after the hand withdraws');
       await setup({ board: [{ x: 1, y: 1, piece: 'straight', rot: 1 }, { x: 2, y: 1, piece: 'straight', rot: 1 }] });
-      // Use the authored panel placement for the ring close-up, then return to the gallery framing.
+      // A closer camera for the ring, then back to the gallery framing.
       const heroCamera = camera;
-      await page.evaluate(() => { const p = window.FRAMEWORK_MCP_RUNTIME.world.requireSceneObject('game-panel'); p.position.set(0, 0.23, -0.32); p.rotation.set(-40 * Math.PI / 180, 0, 0); });
       await remote('set_device_state', { state: { fov: 68 } });
       await remote('set_transform', { device: 'headset', position: { x: 0, y: 1.75, z: 0.02 } });
       await remote('look_at', { device: 'headset', target: { x: 0, y: 1.42, z: -0.48 } });
       camera = await remote('get_transform', { device: 'headset' });
-      entry.ringCamera = { ...camera, fov: 68, panel: 'authored placement; assembly uses a close-up crop' };
+      entry.ringCamera = { ...camera, fov: 68, crop: 'assembly uses a close-up crop' };
       entry.dialGeometry = await page.evaluate(() => {
         const root = window.FRAMEWORK_MCP_RUNTIME.world.requireSceneEntity('board-root').object3D;
         root.updateWorldMatrix(true, true); const dial = root.getObjectByName('TideDial'), bounds = [];
@@ -214,7 +209,6 @@ async function captureStage(name) {
       });
       await sequence([{ pinch: 0, duration: 0.3 }]); await wait(150);
       entry.releaseTick = (await state()).tick;
-      await page.evaluate(() => { const p = window.FRAMEWORK_MCP_RUNTIME.world.requireSceneObject('game-panel'); p.position.set(0.49, 0.12, 0); p.rotation.set(-70 * Math.PI / 180, 0, 0); });
       camera = heroCamera; await remote('set_device_state', { state: { fov: 56 } }); await park();
       // Use the real one-hand step controls to select the exact failure tick for the still and launch.
       for (let n = 0; n < 12 && (await state()).tick !== 3; n++) await press((await state()).tick < 3 ? 'TideForward' : 'TideBack');

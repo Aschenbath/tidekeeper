@@ -1,0 +1,25 @@
+{
+  "name": "Seated reach: mission 1, panel side and reach without leaning or walking",
+  "actions": [
+    { "setup": { "reset": true } },
+    { "seated": ["hand-right", "Tray_bend", "Cell_2_1", "Launch"] },
+    { "wait": 3 },
+    { "check": "seatedM01" },
+    { "seated": ["hand-right", "Settings"] },
+    { "seated": ["hand-right", "PanelSide"] },
+    { "check": "panelLeft" },
+    { "wait": 0.7 },
+    { "seated": ["hand-left", "CloseSettings"] },
+    { "seated": ["hand-left", "Reach"] },
+    { "check": "farReach" },
+    { "wait": 0.7 },
+    { "seated": ["hand-left", "Reach"] },
+    { "check": "nearReach" },
+    { "wait": 0.7 },
+    { "seated": ["hand-left", "Settings"] },
+    { "seated": ["hand-left", "PanelSide"] },
+    { "check": "panelRight" },
+    { "wait": 0.7 },
+    { "seated": ["hand-right", "CloseSettings"] }
+  ]
+}

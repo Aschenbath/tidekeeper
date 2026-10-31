@@ -8,7 +8,7 @@ Deadline: 2026-11-18 12:00 PT. Build window 2026-11-01 → 11-14, buffer 11-15 �
 
 ## 1. Player promise
 
-> A tiny archipelago sits on your real table. Letters must reach the villages before the tide shuts the canals.
+> A tiny archipelago floats in front of you at table height. Letters must reach the villages before the tide shuts the canals.
 > Pinch channels into place, scrub time forward to see what the sea will do, then launch the boats and watch your plan
 > work. Every delivery lights another village.
 
@@ -103,8 +103,11 @@ The board is the interaction surface. Two equivalent ways to do everything, both
 - On entering XR, the board appears ~0.45 m in front of the player and ~0.35 m below eye height, tilted 15° towards
   them, on an invisible table plane. A small "Move board" handle (pinch-drag, or poke arrows) and "Reach: near / far"
   setting adjust it. Board stays world-locked when the head moves.
-- All controls (tray, dial, launch, undo) sit within ±30° horizontally of the board centre and below eye line; the
-  mission card floats just above the board's far edge. Nothing requires turning the head more than ~35°.
+- Tray, dial and board sit within ±30° horizontally of the board centre and below eye line. The mission card (launch,
+  undo, tide steps, settings) stands beside the board, past the dial on the widest board, turned toward that shoulder:
+  within the emulator's comfortable fingertip reach of that shoulder without leaning (`tests/xr/11-seated-reach`).
+  It is right-hand by default; Settings moves it to the left. Reading it means a glance or head turn of about 45°.
+  (It first floated above the board's far edge, about 0.8 m from the shoulder: out of seated reach.)
 - Passthrough (mode `ar`): the real room is visible; the archipelago is a diorama on it. If AR is not supported,
   fall back to VR with a simple soft-gradient room (feature-detected, not assumed).
 - Desktop fallback (no XR): the same scene is playable with a mouse (click = poke) so a judge without a headset can try

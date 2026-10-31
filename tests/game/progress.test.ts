@@ -18,7 +18,7 @@ describe("progress", () => {
     }));
     expect(p.missions).toEqual({ m01: { stars: 3, pieces: 1, tick: 4 } });
     expect(p.daily).toEqual({ lastSolved: null, streak: 0, best: {} });
-    expect(p.settings).toEqual({ reach: "far", sound: true });
+    expect(p.settings).toEqual({ reach: "far", sound: true, panel: "right" });
   });
 
   it("keeps the best stars and board per mission", () => {

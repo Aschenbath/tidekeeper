@@ -172,6 +172,9 @@
       "press": "MoveLeft"
     },
     {
+      "check": "nearReach"
+    },
+    {
       "press": "Move"
     },
     {
