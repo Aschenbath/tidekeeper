@@ -73,6 +73,15 @@ The scenarios in `tests/xr/` drive simulated hands (poke, pinch, carry, tracking
 real game. Dev-only helpers may set up a board, but every launch is pressed by a hand. The debug surface is not in
 production builds.
 
+## Submission capture
+
+`node scripts/trailer.mjs` records the video footage and gallery stills from real IWER hand input against the running
+dev server; `bash ../media/assemble.sh` cuts them into a silent 2:22 1920×1080 video. For a readable 16:9 frame it
+uses a downward head pose and, in its own browser only, moves the mission panel beside the board through the DEV-only
+debug surface. Later missions start from seeded progress and `GameDebug` boards, but every launch is pressed by a hand.
+Each run writes a manifest of hand events and state checks. Stages can be rerun with `--only=<stage>`; see the header
+of `scripts/trailer.mjs` for options.
+
 ## Limits
 
 Built and tested in the emulator; comfort, real passthrough and real hand tracking still need a check on a headset.
