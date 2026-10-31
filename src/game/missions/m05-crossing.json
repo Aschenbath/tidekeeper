@@ -1,0 +1,31 @@
+{
+  "id": "m05",
+  "title": "Crossing",
+  "coach": ["Two boats in the crossing at once will collide. Watch the dial."],
+  "grid": ["~~H~~~", "~#.~~~", "H.=..D", "~#.~~~", "~~D~~~"],
+  "harbors": [
+    { "id": "west", "x": 0, "y": 2, "exit": "E" },
+    { "id": "north", "x": 2, "y": 0, "exit": "S" }
+  ],
+  "docks": [
+    { "x": 5, "y": 2, "open": "W", "shape": "circle" },
+    { "x": 2, "y": 4, "open": "N", "shape": "triangle" }
+  ],
+  "fixed": [{ "x": 2, "y": 2, "piece": "cross", "rot": 0 }],
+  "bars": [],
+  "tide": [1],
+  "boats": [
+    { "id": "circ", "harbor": "west", "shape": "circle", "launch": 0 },
+    { "id": "tri", "harbor": "north", "shape": "triangle", "launch": 0 }
+  ],
+  "budget": { "straight": 4, "bend": 0, "lock": 1 },
+  "tickLimit": 12,
+  "mastery": { "kind": "arriveBy", "value": 5 },
+  "solution": [
+    { "x": 1, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 4, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 2, "y": 1, "piece": "lock", "rot": 0, "wait": 1 },
+    { "x": 2, "y": 3, "piece": "straight", "rot": 0 }
+  ]
+}

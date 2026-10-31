@@ -49,6 +49,7 @@ export class TidekeeperSystem extends createSystem({
   private debugEntity?: Entity;
   private touchQuiet = { left: 1, right: 1, mouse: 1 };
   private now = 0;
+  private pressStart = new WeakMap<Entity, number>();
   // Every edit respawns the pieces under the fingertip that made it; the finger leaving must not edit the new piece.
   private lastEditAt = -1;
   private settling() { return this.now - this.lastEditAt < 0.25; }
@@ -63,7 +64,7 @@ export class TidekeeperSystem extends createSystem({
       this.queries.held.subscribe('qualify', e => this.beginGrab(e)),
       this.queries.held.subscribe('disqualify', e => this.endGrab(e)),
       this.queries.pressed.subscribe('qualify', e => {
-        e.setValue(BoardItem, 'pressSeconds', 0);
+        e.setValue(BoardItem, 'pressSeconds', 0); this.pressStart.set(e, performance.now());
         const hand = e.getValue(BoardItem, 'hand');
         e.setValue(BoardItem, 'pinchContact', (hand === 'left' || hand === 'right') && this.input.xr.getSelectState(hand).active);
         e.setValue(BoardItem, 'pokeAllowed', this.touchQuiet[this.touchSlot(e)] >= 0.15);
@@ -385,8 +386,11 @@ export class TidekeeperSystem extends createSystem({
     }
     for (const e of this.queries.pressed.entities) {
       this.touchQuiet[this.touchSlot(e)] = 0;
-      const elapsed = e.getValue(BoardItem, 'pressSeconds')! + delta; e.setValue(BoardItem, 'pressSeconds', elapsed);
-      if (elapsed >= 0.6 && elapsed - delta < 0.6 && e.getValue(BoardItem, 'kind')! === 'placed' && e.getValue(BoardItem, 'pokeAllowed') && !e.hasComponent(Grabbed) && this.game.editable) {
+      // Wall-clock contact time: summing frame deltas also counts the frame before contact, so one slow frame
+      // (headless shader compile) could turn a tap into a hold-to-remove.
+      const previous = e.getValue(BoardItem, 'pressSeconds')!;
+      const elapsed = (performance.now() - (this.pressStart.get(e) ?? performance.now())) / 1000; e.setValue(BoardItem, 'pressSeconds', elapsed);
+      if (elapsed >= 0.6 && previous < 0.6 && e.getValue(BoardItem, 'kind')! === 'placed' && e.getValue(BoardItem, 'pokeAllowed') && !e.hasComponent(Grabbed) && this.game.editable) {
         const x = e.getValue(BoardItem, 'x')!, y = e.getValue(BoardItem, 'y')!;
         queueMicrotask(() => this.changed(this.game.edit(editor => editor.remove(x, y))));
       }

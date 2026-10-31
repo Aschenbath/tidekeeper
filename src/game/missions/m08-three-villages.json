@@ -1,0 +1,42 @@
+{
+  "id": "m08",
+  "title": "Three Villages",
+  "coach": ["Boats leave on a schedule. Make room for the one behind."],
+  "grid": ["~~~H~~~", "H..=..D", "H..=..D", "~.....~", "~~~D~~~"],
+  "harbors": [
+    { "id": "north", "x": 3, "y": 0, "exit": "S" },
+    { "id": "upper", "x": 0, "y": 1, "exit": "E" },
+    { "id": "lower", "x": 0, "y": 2, "exit": "E" }
+  ],
+  "docks": [
+    { "x": 6, "y": 1, "open": "W", "shape": "square" },
+    { "x": 6, "y": 2, "open": "W", "shape": "circle" },
+    { "x": 3, "y": 4, "open": "N", "shape": "triangle" }
+  ],
+  "fixed": [
+    { "x": 3, "y": 1, "piece": "cross", "rot": 0 },
+    { "x": 3, "y": 2, "piece": "cross", "rot": 0 }
+  ],
+  "bars": [],
+  "tide": [1],
+  "boats": [
+    { "id": "sq", "harbor": "upper", "shape": "square", "launch": 0 },
+    { "id": "c1", "harbor": "lower", "shape": "circle", "launch": 0 },
+    { "id": "tri", "harbor": "north", "shape": "triangle", "launch": 1 },
+    { "id": "c2", "harbor": "lower", "shape": "circle", "launch": 2 }
+  ],
+  "budget": { "straight": 9, "bend": 4, "lock": 1 },
+  "tickLimit": 16,
+  "mastery": { "kind": "arriveBy", "value": 9 },
+  "solution": [
+    { "x": 1, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 2, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 4, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 5, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 1, "y": 2, "piece": "lock", "rot": 1, "wait": 1 },
+    { "x": 2, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 4, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 5, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 3, "piece": "straight", "rot": 0 }
+  ]
+}

@@ -1,4 +1,4 @@
-import { DIR_NAMES, PIECE_TYPES, type Dir, type Mission, type PieceType, type Placement, type Shape } from "./types";
+import { DIR_NAMES, PIECE_TYPES, type BoardPiece, type Dir, type Mission, type PieceType, type Placement, type Shape } from "./types";
 import { rotations } from "./geometry";
 
 const SHAPES: Shape[] = ["circle", "triangle", "square", "diamond"];
@@ -34,12 +34,12 @@ export function loadMission(raw: RawMission): Mission {
     if (!SHAPES.includes(d.shape as Shape)) fail(`dock shape ${d.shape}`);
     return { ...d, open: dir(d.open, "dock"), shape: d.shape as Shape };
   });
-  const checkPiece = (p: Placement, what: string) => {
-    if (!PIECE_TYPES.includes(p.piece)) fail(`${what}: unknown piece ${p.piece}`);
+  const checkPiece = (p: BoardPiece, what: string, fixed = false) => {
+    if (!PIECE_TYPES.includes(p.piece as PieceType) && !(fixed && p.piece === "cross")) fail(`${what}: unknown piece ${p.piece}`);
     if (!Number.isInteger(p.rot) || p.rot < 0 || p.rot >= rotations(p.piece)) fail(`${what}: bad rotation ${p.rot}`);
     if (p.piece === "lock" && ![1, 2, 3].includes(p.wait ?? 1)) fail(`${what}: lock wait must be 1..3`);
   };
-  raw.fixed.forEach((p) => { expect(p.x, p.y, "=", "fixed piece"); checkPiece(p, `fixed ${p.x},${p.y}`); });
+  raw.fixed.forEach((p) => { expect(p.x, p.y, "=", "fixed piece"); checkPiece(p, `fixed ${p.x},${p.y}`, true); });
   for (const char of ["H", "D", "="]) {
     const listed = char === "H" ? harbors : char === "D" ? docks : raw.fixed;
     const count = raw.grid.join("").split(char).length - 1;

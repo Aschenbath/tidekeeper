@@ -1,0 +1,39 @@
+{
+  "id": "m06",
+  "title": "Narrow Budget",
+  "coach": ["Old channels are free. Build only what is missing."],
+  "grid": ["~===.=D", "~=##.#~", "H.==.=D", "~.##.#~", "~~~~H~~"],
+  "harbors": [
+    { "id": "west", "x": 0, "y": 2, "exit": "E" },
+    { "id": "south", "x": 4, "y": 4, "exit": "N" }
+  ],
+  "docks": [
+    { "x": 6, "y": 0, "open": "W", "shape": "circle" },
+    { "x": 6, "y": 2, "open": "W", "shape": "triangle" }
+  ],
+  "fixed": [
+    { "x": 1, "y": 0, "piece": "bend", "rot": 1 },
+    { "x": 2, "y": 0, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 0, "piece": "straight", "rot": 1 },
+    { "x": 5, "y": 0, "piece": "straight", "rot": 1 },
+    { "x": 1, "y": 1, "piece": "straight", "rot": 0 },
+    { "x": 2, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 2, "piece": "straight", "rot": 1 },
+    { "x": 5, "y": 2, "piece": "straight", "rot": 1 }
+  ],
+  "bars": [],
+  "tide": [1],
+  "boats": [
+    { "id": "circ", "harbor": "west", "shape": "circle", "launch": 0 },
+    { "id": "tri", "harbor": "south", "shape": "triangle", "launch": 0 }
+  ],
+  "budget": { "straight": 3, "bend": 3, "lock": 0 },
+  "tickLimit": 14,
+  "mastery": { "kind": "maxPieces", "value": 4 },
+  "solution": [
+    { "x": 1, "y": 2, "piece": "bend", "rot": 3 },
+    { "x": 4, "y": 0, "piece": "straight", "rot": 1 },
+    { "x": 4, "y": 3, "piece": "straight", "rot": 0 },
+    { "x": 4, "y": 2, "piece": "bend", "rot": 1 }
+  ]
+}

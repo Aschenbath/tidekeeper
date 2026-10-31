@@ -1,5 +1,5 @@
 import { DX, DY, exitSide, key, opposite } from "./geometry";
-import type { BoatFrame, Dir, Failure, Frame, Mission, Placement, Simulation } from "./types";
+import type { BoardPiece, BoatFrame, Dir, Failure, Frame, Mission, Placement, Simulation } from "./types";
 
 export const tideLevel = (mission: Mission, tick: number) => mission.tide[tick % mission.tide.length];
 
@@ -9,8 +9,8 @@ export function barsWet(mission: Mission, tick: number): boolean[] {
 }
 
 /** Pieces on the board: the mission's fixed pieces plus the player's placements. */
-export function pieceMap(mission: Mission, placements: readonly Placement[]): Map<string, Placement> {
-  const map = new Map<string, Placement>();
+export function pieceMap(mission: Mission, placements: readonly Placement[]): Map<string, BoardPiece> {
+  const map = new Map<string, BoardPiece>();
   for (const p of mission.fixed) map.set(key(p.x, p.y), p);
   for (const p of placements) map.set(key(p.x, p.y), p);
   return map;

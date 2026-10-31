@@ -1,0 +1,45 @@
+{
+  "id": "m09",
+  "title": "Lighthouse",
+  "coach": ["Everything you have learned, all at once. The lighthouse is waiting."],
+  "grid": ["~~~H~~~", "H=.==.D", "~..=..~", "H..=.=D", "~.....~", "~~~D~~~"],
+  "harbors": [
+    { "id": "north", "x": 3, "y": 0, "exit": "S" },
+    { "id": "upper", "x": 0, "y": 1, "exit": "E" },
+    { "id": "lower", "x": 0, "y": 3, "exit": "E" }
+  ],
+  "docks": [
+    { "x": 6, "y": 1, "open": "W", "shape": "square" },
+    { "x": 6, "y": 3, "open": "W", "shape": "circle" },
+    { "x": 3, "y": 5, "open": "N", "shape": "triangle" }
+  ],
+  "fixed": [
+    { "x": 1, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 1, "piece": "cross", "rot": 0 },
+    { "x": 4, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 2, "piece": "straight", "rot": 0 },
+    { "x": 3, "y": 3, "piece": "cross", "rot": 0 },
+    { "x": 5, "y": 3, "piece": "straight", "rot": 1 }
+  ],
+  "bars": [{ "x": 5, "y": 3, "threshold": 2 }],
+  "tide": [2, 1, 1, 2, 3, 3, 2, 2],
+  "boats": [
+    { "id": "tri", "harbor": "north", "shape": "triangle", "launch": 0 },
+    { "id": "sq", "harbor": "upper", "shape": "square", "launch": 0 },
+    { "id": "c1", "harbor": "lower", "shape": "circle", "launch": 0 },
+    { "id": "c2", "harbor": "lower", "shape": "circle", "launch": 3 }
+  ],
+  "budget": { "straight": 6, "bend": 4, "lock": 1 },
+  "tickLimit": 20,
+  "mastery": { "kind": "maxPieces", "value": 8 },
+  "solution": [
+    { "x": 2, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 5, "y": 1, "piece": "straight", "rot": 1 },
+    { "x": 3, "y": 4, "piece": "straight", "rot": 0 },
+    { "x": 1, "y": 3, "piece": "bend", "rot": 2 },
+    { "x": 1, "y": 4, "piece": "bend", "rot": 0 },
+    { "x": 2, "y": 4, "piece": "bend", "rot": 3 },
+    { "x": 2, "y": 3, "piece": "bend", "rot": 1 },
+    { "x": 4, "y": 3, "piece": "lock", "rot": 1, "wait": 1 }
+  ]
+}

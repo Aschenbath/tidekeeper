@@ -3,7 +3,7 @@ import {
   Shape, ExtrudeGeometry, Group, Mesh, MeshStandardMaterial, ShaderMaterial,
   InstancedMesh, Object3D, DoubleSide, SphereGeometry,
 } from '@iwsdk/core';
-import type { Mission, PieceType, Shape as BoatShape } from '../game/types';
+import type { BoardPieceType, Mission, Shape as BoatShape } from '../game/types';
 
 // Deterministic, Y-up, meters. Board origin is centre; grid south is +Z.
 export const CELL = 0.055;
@@ -20,13 +20,18 @@ function box(name: string, w: number, h: number, d: number, mat: MeshStandardMat
 export function cellPosition(mission: Mission, x: number, y: number) {
   return { x: (x - (mission.width - 1) / 2) * CELL, z: (y - (mission.height - 1) / 2) * CELL };
 }
-export function createPiece(piece: PieceType) {
+export function createPiece(piece: BoardPieceType) {
   const g = new Group(); g.name = `${piece} channel`;
   const bed = mesh('Rounded channel bed', new CylinderGeometry(0.026, 0.023, 0.008, 12), paper);
   bed.position.y = 0.004; g.add(bed);
   g.add(box('North waterway', 0.017, 0.002, 0.027, teal, 0, 0.009, -0.012));
   if (piece === 'bend') g.add(box('East waterway', 0.027, 0.002, 0.017, teal, 0.012, 0.009, 0));
   else g.add(box('South waterway', 0.017, 0.002, 0.027, teal, 0, 0.009, 0.012));
+  if (piece === 'cross') {
+    // A crossing: the east-west channel plus a stone pier at each corner, so it reads apart from player pieces.
+    g.add(box('East-west waterway', 0.051, 0.002, 0.017, teal, 0, 0.0095, 0));
+    for (const [px, pz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) g.add(box('Crossing pier', 0.007, 0.01, 0.007, ink, px * 0.017, 0.011, pz * 0.017));
+  }
   if (piece === 'lock') {
     g.add(box('Lock gate', 0.027, 0.012, 0.005, ochre, 0, 0.014, 0));
     for (let i = 0; i < 3; i++) g.add(box(`Wait ${i + 1}`, 0.004, 0.003, 0.007, ink, 0.02, 0.01, (i - 1) * 0.009));

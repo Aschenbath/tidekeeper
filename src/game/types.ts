@@ -7,6 +7,8 @@ export type DirName = (typeof DIR_NAMES)[number];
 
 export type PieceType = "straight" | "bend" | "lock";
 export const PIECE_TYPES: PieceType[] = ["straight", "bend", "lock"];
+/** A crossing is open on all four sides and carries boats straight through; missions place it, players never do. */
+export type BoardPieceType = PieceType | "cross";
 export type Shape = "circle" | "triangle" | "square" | "diamond";
 
 export interface Placement {
@@ -16,6 +18,9 @@ export interface Placement {
   rot: number; // straight and lock: 0..1, bend: 0..3
   wait?: number; // lock only: 1..3 ticks
 }
+
+/** A piece on the board: a player placement or one of the mission's fixed pieces. */
+export interface BoardPiece extends Omit<Placement, "piece"> { piece: BoardPieceType }
 
 export interface Harbor { id: string; x: number; y: number; exit: Dir }
 export interface Dock { x: number; y: number; open: Dir; shape: Shape }
@@ -38,7 +43,7 @@ export interface Mission {
   grid: string[];
   harbors: Harbor[];
   docks: Dock[];
-  fixed: Placement[];
+  fixed: BoardPiece[];
   bars: Bar[];
   /** Tide level per tick, repeating. */
   tide: number[];
