@@ -1,0 +1,24 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {
+    "com.iwsdk.components.DomeGradient": { "sky": [0.83, 0.9, 0.89, 1], "equator": [0.95, 0.91, 0.82, 1], "ground": [0.7, 0.78, 0.77, 1], "intensity": 1 },
+    "com.iwsdk.components.IBLGradient": { "sky": [0.96, 0.95, 0.9, 1], "equator": [0.8, 0.86, 0.85, 1], "ground": [0.5, 0.55, 0.5, 1], "intensity": 0.5 }
+  },
+  "environment": { "toneMapping": "aces", "exposure": 1, "shadows": false },
+  "resources": {},
+  "nodes": [
+    {
+      "id": "board-root", "name": "Tidekeeper Board",
+      "transform": { "position": [0, 1.25, -0.45], "rotationDeg": [15, 0, 0] },
+      "children": [
+        { "id": "archipelago", "name": "Archipelago", "content": { "type": "asset", "asset": "board-m01" } },
+        { "id": "game-panel", "name": "Mission Card", "content": { "type": "asset", "asset": "game-panel" }, "transform": { "position": [0.49, 0.14, 0], "rotationDeg": [-25, -35, 0] }, "components": { "RayInteractable": {}, "PokeInteractable": {} } },
+        { "id": "coach-panel", "name": "Coach", "content": { "type": "asset", "asset": "coach-panel" }, "transform": { "position": [0, 0.008, 0.125], "rotationDeg": [-90, 0, 0] } }
+      ]
+    },
+    { "id": "sun", "transform": { "position": [-2, 5, 2], "rotationDeg": [-55, -20, 0] }, "components": { "DirectionalLight": { "color": [1, 0.95, 0.86, 1], "intensity": 2, "castShadow": false } } },
+    { "id": "fill", "components": { "HemisphereLight": { "skyColor": [0.9, 0.96, 0.98, 1], "groundColor": [0.76, 0.72, 0.61, 1], "intensity": 1 } } }
+  ],
+  "authoring": { "views": [{ "id": "hero", "role": "hero", "projection": "perspective", "position": [0, 1.6, 0.15], "target": [0, 1.26, -0.47], "fov": 54 }] }
+}

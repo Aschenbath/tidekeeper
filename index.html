@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="icon" href="data:," />
+    <title>Tidekeeper</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #dee9e3; color: #26484e; }
+      #entry { position: fixed; bottom: 3vh; left: 50%; transform: translateX(-50%); background: #f3e8ce; border-radius: 22px; padding: 18px 28px; text-align: center; box-shadow: 0 8px 30px #26484e33; }
+      #entry[hidden] { display: none; }
+      h1 { margin: 0; font-size: 26px; } p { margin: 7px 0 13px; font-size: 14px; }
+      #play { display: block; margin: 10px auto; padding: 14px 72px; background: #267e80; color: #fffbed; border: 0; border-radius: 14px; font-size: 22px; cursor: pointer; }
+      #entry-status:empty { display: none; } #entry-status { color: #a2402e; max-width: 34em; }
+      label { font-size: 14px; } a { color: #26484e; }
+    </style>
+    <script type="module" crossorigin src="/tidekeeper/assets/index-D3skNLPr.js"></script>
+  </head>
+  <body style="margin: 0">
+    <div id="scene-container"></div>
+    <div id="entry">
+      <h1>Tidekeeper</h1>
+      <p>Carry channels. Predict the tide. Deliver a letter.</p>
+      <button id="play" disabled>Loading...</button>
+      <label><input id="ar" type="checkbox" /> Show my room (AR)</label>
+      <label><input id="left-card" type="checkbox" /> Mission card on my left</label>
+      <p>Hands: pinch or poke. Browser: click to poke.</p>
+      <p id="entry-status" role="status"></p>
+    </div>
+  </body>
+</html>

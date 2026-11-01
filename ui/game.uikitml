@@ -1,0 +1,98 @@
+<style>
+  .card { width: 42; flex-direction: column; gap: 0.7; padding: 1; background-color: #f3e8ce; border-radius: 1.5; }
+  .title { color: #26484e; font-size: 2; font-weight: 700; }
+  .body { color: #26484e; font-size: 1.35; }
+  .row { flex-direction: row; gap: 0.6; }
+  .button { height: 4.3; flex-grow: 1; min-width: 4.3; align-items: center; justify-content: center; background-color: #d5c9af; border-radius: 0.7; color: #26484e; font-size: 1.35; }
+  .primary { background-color: #267e80; color: #fffbed; }
+  .hidden { display: none; }
+  .section { flex-direction: column; gap: 0.7; }
+  .village { height: 5.2; font-size: 1.1; }
+</style>
+<div id="Card" class="card">
+ <div id="GameView" class="section">
+  <span id="MissionTitle" class="title">Tidekeeper / First Letter</span>
+  <span id="Status" class="body">Pinch to carry. Poke to select and place.</span>
+  <span id="Goal" class="body">Deliver everything by tick 4</span>
+  <span id="DailySummary" class="body hidden">Streak 0</span>
+  <div id="EditControls" class="row">
+    <button id="Undo" class="button">Undo</button>
+    <button id="Redo" class="button">Redo</button>
+    <button id="Hint" class="button">Hint</button>
+    <button id="Restart" class="button">Restart</button>
+  </div>
+  <div class="row">
+    <button id="TideBack" class="button">&lt; Tide</button>
+    <span id="Tick" class="body">Tick 0 / 10</span>
+    <button id="TideForward" class="button">Tide &gt;</button>
+  </div>
+  <div id="RunControls" class="row">
+    <button id="Launch" class="button primary">Launch</button>
+    <button id="Pause" class="button hidden">Pause</button>
+    <button id="Stop" class="button hidden">Stop</button>
+    <button id="Next" class="button hidden primary">Next</button>
+  </div>
+  <div id="FailureControls" class="row hidden">
+    <button id="FailureUndo" class="button primary">Undo last change</button>
+    <button id="Back" class="button">Back to editing</button>
+  </div>
+ </div>
+ <div id="MapView" class="section hidden">
+  <span class="title">Tidekeeper / Archipelago</span>
+  <span id="MapStatus" class="body">Every delivery lights a village.</span>
+  <div class="row">
+   <button id="Mission1" class="button village">1. First Letter</button>
+   <button id="Mission2" class="button village">2. Two Shapes</button>
+   <button id="Mission3" class="button village">3. Low Water</button>
+  </div>
+  <div class="row">
+   <button id="Mission4" class="button village">4. The Lock</button>
+   <button id="Mission5" class="button village">5. Crossing</button>
+   <button id="Mission6" class="button village">6. Narrow Budget</button>
+  </div>
+  <div class="row">
+   <button id="Mission7" class="button village">7. Spring Tide</button>
+   <button id="Mission8" class="button village">8. Three Villages</button>
+   <button id="Mission9" class="button village">9. Lighthouse</button>
+  </div>
+  <span id="DailyInfo" class="body">Today's tide / Streak 0</span>
+  <div class="row">
+   <button id="Daily" class="button primary">Daily tide</button>
+   <button id="ResumeMission" class="button">Back to board</button>
+  </div>
+ </div>
+ <div id="SettingsView" class="section hidden">
+  <span class="title">Settings</span>
+  <span class="body">Either hand: pinch to carry, or poke to select.</span>
+  <span class="body">Tap to turn; hold 0.6 seconds to remove.</span>
+  <span class="body">Lock: tap for wait, Turn lock for direction.</span>
+  <span class="body">Mouse clicks work too. No gaze required.</span>
+  <span id="StorageNote" class="body">Progress saved on this device.</span>
+  <button id="PanelSide" class="button">Panel: right hand</button>
+  <button id="ResetProgress" class="button">Reset progress</button>
+  <div id="ResetConfirm" class="section hidden">
+   <span class="body">Erase villages, daily records and settings?</span>
+   <div class="row">
+    <button id="CancelReset" class="button primary">Keep progress</button>
+    <button id="ConfirmReset" class="button">Erase everything</button>
+   </div>
+  </div>
+  <button id="CloseSettings" class="button primary">Back</button>
+ </div>
+  <div class="row">
+    <button id="Reach" class="button">Reach: near</button>
+    <button id="Move" class="button">Move board</button>
+    <button id="Sound" class="button">Sound: on</button>
+    <button id="RotateLock" class="button hidden">Turn lock</button>
+  </div>
+  <div id="MoveControls" class="row hidden">
+    <button id="MoveLeft" class="button">Left</button>
+    <button id="MoveRight" class="button">Right</button>
+    <button id="MoveUp" class="button">Up</button>
+    <button id="MoveDown" class="button">Down</button>
+  </div>
+ <div class="row">
+  <button id="Map" class="button hidden">Map of villages</button>
+  <button id="Settings" class="button">Settings</button>
+ </div>
+</div>
