@@ -21,7 +21,7 @@ piece back. Undo, redo, restart and hints are always one press away.
 ## Try it
 
 - **Quest 3:** open the page in the Meta Quest Browser and press **Play**. It starts in mixed reality (passthrough)
-  when available, VR otherwise. Designed and tested for hands; controllers are not part of the tested flow.
+  when available, VR otherwise. Designed and tested for hands; controllers are not part of the tested flow, and while one is in use the hint line under the board asks you to set it down.
 - **No headset:** open the same page on a desktop browser. **Play in browser** shows the board and lets the mouse
   act as a fingertip. Developers can use IWSDK's [IWER emulator](https://iwsdk.dev/guides/02-testing-experience.html)
   for the full XR flow.

@@ -56,6 +56,8 @@ export class TidekeeperSystem extends createSystem({
   private message = '';
   private statusText = ''; 
   private uiQueued = false;
+  /** A controller is the primary input on either side: the game is played with hands, so say how to switch. */
+  private controllers = false;
   private debugEntity?: Entity;
   private touchQuiet = { left: 1, right: 1, mouse: 1 };
   private now = 0;
@@ -487,6 +489,8 @@ export class TidekeeperSystem extends createSystem({
       const session = this.world.session;
       session.addEventListener('visibilitychange', () => { if (session.visibilityState !== 'visible' && this.game.phase === 'running') { this.game.pause(); this.queueUI(); } });
     }
+    const controllers = !!this.world.session && HANDS.some((side) => this.input.xr.isPrimary('controller', side));
+    if (controllers !== this.controllers) { this.controllers = controllers; this.queueUI(); }
     (this.water.material as ShaderMaterial).uniforms.time.value = time;
     // A long frame gap (system menu, headset off) must not jump a running delivery ahead.
     if (this.game.advance(Math.min(delta, 0.25))) this.queueUI();
@@ -575,7 +579,10 @@ export class TidekeeperSystem extends createSystem({
     // Coach the next step from the board's state: a working first board needs Launch; a failed preview needs a new route, not a later start.
     const coachLine = s.missionIndex === 0 && s.simulation.outcome.kind === 'success' ? 'Now press Launch on the card beside the board.'
       : failure && s.missionIndex < 4 ? 'Boats always leave at tick 0. Change the channels, then check the tide again.' : coachLines[s.missionIndex];
-    this.coach.requireElementById<UIKit.Text>('CoachText').setProperties({ text: !this.campaign.dailyDate && s.missionIndex < 4 && s.editable ? coachLine : '' });
+    this.coach.requireElementById<UIKit.Text>('CoachText').setProperties({
+      text: this.controllers ? 'Tidekeeper is played with your hands: set the controllers down, then pinch or poke.'
+        : !this.campaign.dailyDate && s.missionIndex < 4 && s.editable ? coachLine : '',
+    });
     this.coach.position.set(0, 0.009, this.trayZ() + 0.047);
     this.coach.scale.setScalar(1);
     this.refreshNavigation();
