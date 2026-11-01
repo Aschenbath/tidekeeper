@@ -11,6 +11,7 @@ import { MISSIONS } from '../game/missions';
 import { villagesLit } from '../game/progress';
 import { masteryText } from '../game/score';
 import { tideLevel } from '../game/sim';
+import { dialTick, startDialTurn } from '../game/dial';
 import { CELL, createBoard } from '../scene-assets/tidekeeper.scene-asset';
 import type { PieceType, Placement } from '../game/types';
 import { Sound, type Cue } from './audio';
@@ -49,6 +50,7 @@ export class TidekeeperSystem extends createSystem({
   private ready = false;
   private xrPlaced = false;
   private launching = false;
+  private dialTurn = startDialTurn();
   private shownTick = -1;
   private shownPhase = '';
   private message = '';
@@ -269,6 +271,7 @@ export class TidekeeperSystem extends createSystem({
       e.setValue(BoardItem, 'cancelled', true); this.grab.forceRelease(e); return;
     }
     e.setValue(BoardItem, 'heldSeconds', 0); e.setValue(BoardItem, 'lostSeconds', 0);
+    if (kind === 'dial') this.dialTurn = startDialTurn();
     const pointerHand = e.getValue(BoardItem, 'hand');
     let hand = pointerHand === 'left' || pointerHand === 'right' ? pointerHand : this.grab.getHolderHand(e);
     // RC.2's holder helper omits the touch sub-pointer, which can own a near
@@ -507,7 +510,7 @@ export class TidekeeperSystem extends createSystem({
       if (moved) e.setValue(BoardItem, 'moved', true);
       if (kind === 'dial') {
         const angle = Math.atan2(this.temp.x - this.dialX(), -(this.temp.z));
-        const tick = Math.round(((angle + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2) * this.game.mission.tickLimit);
+        const tick = dialTick(this.dialTurn, angle, this.game.mission.tickLimit);
         if (this.game.tick !== tick) { this.game.scrub(tick); this.feedback('dial'); this.queueUI(); }
       } else if (kind === 'handle') {
         this.temp2.set(this.temp.x - v[0], this.temp.y - v[1], this.temp.z - v[2]);
