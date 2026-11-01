@@ -44,5 +44,21 @@ try {
     lines.push(line);console.log(line);
     await context.close();
   }
+  // A refused session request (permission denied, device busy) must be visible on the entry card, with Play still available.
+  {
+    const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:800,height:800}});
+    await context.addInitScript({content:injection.outputFiles[0].text});
+    await context.addInitScript(() => { navigator.xr.requestSession = () => Promise.reject(new DOMException('Permission denied', 'NotAllowedError')); });
+    const page=await context.newPage(), errors=[];
+    page.on('pageerror',e=>errors.push(e.message));
+    await page.goto(origin + path);
+    await page.getByRole('button',{name:'Play',exact:true}).click({timeout:8000});
+    const status=page.locator('#entry-status');
+    await status.filter({hasText:'did not start the session'}).waitFor({timeout:5000});
+    if (errors.length || !(await page.locator('#entry').isVisible()) || !(await page.getByRole('button',{name:'Play',exact:true}).isEnabled())) throw new Error(JSON.stringify({errors,status:await status.innerText()}));
+    const line='PASS production refused session: entry card explains and keeps Play';
+    lines.push(line);console.log(line);
+    await context.close();
+  }
 } catch(error) {lines.push(`FAIL production: ${error.message}`);console.error(lines.at(-1));process.exitCode=1}
 finally {await browser?.close();writeFileSync('output/xr/production.txt',lines.join('\n')+'\n')}

@@ -14,6 +14,7 @@
       #entry[hidden] { display: none; }
       h1 { margin: 0; font-size: 26px; } p { margin: 7px 0 13px; font-size: 14px; }
       #play { display: block; margin: 10px auto; padding: 14px 72px; background: #267e80; color: #fffbed; border: 0; border-radius: 14px; font-size: 22px; cursor: pointer; }
+      #entry-status:empty { display: none; } #entry-status { color: #a2402e; max-width: 34em; }
       label { font-size: 14px; } a { color: #26484e; }
     </style>
   </head>
@@ -25,6 +26,7 @@
       <button id="play" disabled>Loading...</button>
       <label><input id="ar" type="checkbox" /> Show my room (AR)</label>
       <p>Hands: pinch or poke. Browser: click to poke.</p>
+      <p id="entry-status" role="status"></p>
     </div>
     <script type="module" src="/src/index.ts"></script>
   </body>

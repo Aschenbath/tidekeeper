@@ -48,6 +48,7 @@ export class TidekeeperSystem extends createSystem({
   private moveControls = false;
   private ready = false;
   private xrPlaced = false;
+  private launching = false;
   private shownTick = -1;
   private shownPhase = '';
   private message = '';
@@ -245,6 +246,13 @@ export class TidekeeperSystem extends createSystem({
       this.changed(this.game.edit(editor => p.piece === 'lock' ? editor.cycleWait(x, y) : editor.rotate(x, y)), p.piece === 'lock' ? 'wait' : 'rotate');
     }
   }
+  /** A headset can end the pinch when it loses the hand while keeping the source. Dropping then would place the piece
+   * wherever the hand was last seen, so a release in a frame with no wrist pose counts as tracking loss. */
+  private handUntracked(hand: 'left' | 'right') {
+    const frame = this.world.renderer.xr.getFrame(), reference = this.world.renderer.xr.getReferenceSpace();
+    const wrist = this.input.xr.getPrimaryInputSource(hand)?.hand?.get('wrist');
+    return !!(frame && reference && wrist && frame.getJointPose && !frame.getJointPose(wrist, reference));
+  }
   private hasCarry() {
     for (const e of this.queries.held.entities) if (e.getValue(BoardItem, 'kind')! === 'tray' || e.getValue(BoardItem, 'kind')! === 'placed') return true;
     return false;
@@ -292,7 +300,7 @@ export class TidekeeperSystem extends createSystem({
     if (!this.ready || !e.object3D! || !e.hasComponent(BoardItem)) return;
     const kind = e.getValue(BoardItem, 'kind')!;
     const holder = e.getValue(BoardItem, 'hand');
-    if ((holder === 'left' || holder === 'right') && !this.input.xr.getPrimaryInputSource(holder)) e.setValue(BoardItem, 'cancelled', true);
+    if ((holder === 'left' || holder === 'right') && (!this.input.xr.getPrimaryInputSource(holder) || this.handUntracked(holder))) e.setValue(BoardItem, 'cancelled', true);
     if (e.getValue(BoardItem, 'cancelled')! || !this.game.editable) { this.resetOrigin(e); this.queueUI(); return; }
     if (kind === 'dial' || kind === 'handle') { this.resetOrigin(e); this.queueUI(); return; }
     const x = e.getValue(BoardItem, 'x')!, y = e.getValue(BoardItem, 'y')!;
@@ -397,6 +405,7 @@ export class TidekeeperSystem extends createSystem({
   private installEntry() {
     const play = document.getElementById('play') as HTMLButtonElement;
     const mode = document.getElementById('ar') as HTMLInputElement;
+    const status = document.getElementById('entry-status')!;
     let supportsAR = false, supportsVR = false;
     void Promise.all([navigator.xr?.isSessionSupported('immersive-ar'), navigator.xr?.isSessionSupported('immersive-vr')]).then(([ar, vr]) => {
       supportsAR = !!ar; supportsVR = !!vr; mode.disabled = !supportsAR; mode.checked = supportsAR;
@@ -407,6 +416,7 @@ export class TidekeeperSystem extends createSystem({
       this.missionStarted = performance.now(); this.root.object3D!.scale.setScalar(0.94); this.fade = 0;
       for (const material of this.fadeMaterials) { material.transparent = true; material.opacity = 0; }
       if (!supportsAR && !supportsVR) { document.getElementById('entry')!.hidden = true; return; }
+      status.textContent = ''; this.launching = true;
       this.world.launchXR({ sessionMode: mode.checked && supportsAR ? SessionMode.ImmersiveAR : SessionMode.ImmersiveVR });
     };
     play.addEventListener('click', start); this.cleanupFuncs.push(() => play.removeEventListener('click', start));
@@ -414,7 +424,8 @@ export class TidekeeperSystem extends createSystem({
       const immersive = state !== VisibilityState.NonImmersive;
       document.getElementById('entry')!.hidden = immersive;
       if (!immersive) this.xrPlaced = false;
-      if (state === VisibilityState.VisibleBlurred && this.game.phase === 'running') this.game.pause();
+      // A run keeps going only while the player can see it: system menu, headset off or leaving the session all pause it.
+      if (state !== VisibilityState.Visible && this.game.phase === 'running') { this.game.pause(); this.queueUI(); }
     }));
   }
   private placeBoard() {
@@ -453,6 +464,13 @@ export class TidekeeperSystem extends createSystem({
     if (this.fade < 1) {
       this.fade = Math.min(1, this.fade + delta * 2);
       for (const material of this.fadeMaterials) { material.opacity = this.fade; if (this.fade === 1) material.transparent = false; }
+    }
+    // The SDK only logs a refused session request, so say so on the entry card and leave Play available.
+    if (this.launching && !this.world.sessionRequestPending) {
+      this.launching = false;
+      if (!this.world.session) document.getElementById('entry-status')!.textContent = (document.getElementById('ar') as HTMLInputElement).checked
+        ? 'The headset did not start the session. Accept the permission prompt and press Play again, or untick "Show my room" to play in VR.'
+        : 'The headset did not start the session. Accept the permission prompt and press Play again.';
     }
     if (this.world.session && !this.xrPlaced) { this.placeBoard(); this.xrPlaced = true; this.queueUI(); }
     (this.water.material as ShaderMaterial).uniforms.time.value = time;
