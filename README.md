@@ -2,6 +2,8 @@
 
 A seated, hands-only mixed-reality puzzle for Meta Quest 3, built with IWSDK 1.1 (WebXR).
 
+**Play:** https://aschenbath.github.io/tidekeeper/ (Meta Quest Browser, or any desktop browser with **Play in browser**).
+
 A tiny archipelago floats in front of you at table height. Letters must reach the villages before the tide shuts the canals.
 Place channel pieces, scrub time forward to see exactly what the sea will do, then launch the boats and watch your
 plan work. Every delivery lights another village; finishing the ninth mission lights the lighthouse.
