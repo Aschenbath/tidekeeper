@@ -31,7 +31,7 @@ try {
     await page.goto(origin + path);
     try { await page.getByRole('button',{name:'Play',exact:true}).waitFor({timeout:8000}); }
     catch (error) { throw new Error(JSON.stringify({message:error.message,errors,outside,body:await page.locator('body').innerText()})); }
-    await page.getByRole('checkbox').setChecked(mode==='ar');
+    await page.getByRole('checkbox',{name:'Show my room (AR)'}).setChecked(mode==='ar');
     await page.getByRole('button',{name:'Play',exact:true}).click();
     await page.waitForFunction(()=>!!window.__testDevice.activeSession);
     await page.waitForTimeout(700);
@@ -56,7 +56,11 @@ try {
     const status=page.locator('#entry-status');
     await status.filter({hasText:'did not start the session'}).waitFor({timeout:5000});
     if (errors.length || !(await page.locator('#entry').isVisible()) || !(await page.getByRole('button',{name:'Play',exact:true}).isEnabled())) throw new Error(JSON.stringify({errors,status:await status.innerText()}));
-    const line='PASS production refused session: entry card explains and keeps Play';
+    // The entry card's side choice is saved before any session starts.
+    await page.getByRole('checkbox',{name:'Mission card on my left'}).check();
+    const saved=await page.evaluate(()=>Object.values(localStorage).some(v=>/"panel":"left"/.test(v)));
+    if (!saved) throw new Error('Entry card side choice was not saved');
+    const line='PASS production refused session: entry card explains and keeps Play; left-card choice saved';
     lines.push(line);console.log(line);
     await context.close();
   }

@@ -110,6 +110,7 @@ export class TidekeeperSystem extends createSystem({
       () => clearTimeout(this.resultTimer),
     );
     this.bindPanel();
+    this.layoutPanel();
     this.createMission();
     this.installEntry();
     this.ready = true;
@@ -409,6 +410,11 @@ export class TidekeeperSystem extends createSystem({
     const play = document.getElementById('play') as HTMLButtonElement;
     const mode = document.getElementById('ar') as HTMLInputElement;
     const status = document.getElementById('entry-status')!;
+    // Left-handed players choose the card's side before entering, so the first reach is not across the body.
+    const leftCard = document.getElementById('left-card') as HTMLInputElement;
+    leftCard.checked = this.panelLeft;
+    const chooseSide = () => { this.panelLeft = leftCard.checked; this.campaign.settings({panel:this.panelLeft ? 'left' : 'right'}); this.layoutPanel(); this.refresh(); };
+    leftCard.addEventListener('change', chooseSide); this.cleanupFuncs.push(() => leftCard.removeEventListener('change', chooseSide));
     let supportsAR = false, supportsVR = false;
     void Promise.all([navigator.xr?.isSessionSupported('immersive-ar'), navigator.xr?.isSessionSupported('immersive-vr')]).then(([ar, vr]) => {
       supportsAR = !!ar; supportsVR = !!vr; mode.disabled = !supportsAR; mode.checked = supportsAR;
@@ -426,7 +432,7 @@ export class TidekeeperSystem extends createSystem({
     this.cleanupFuncs.push(this.world.visibilityState.subscribe(state => {
       const immersive = state !== VisibilityState.NonImmersive;
       document.getElementById('entry')!.hidden = immersive;
-      if (!immersive) this.xrPlaced = false;
+      if (!immersive) { this.xrPlaced = false; (document.getElementById('left-card') as HTMLInputElement).checked = this.panelLeft; }
       // A run keeps going only while the player can see it: system menu, headset off or leaving the session all pause it.
       if (state !== VisibilityState.Visible && this.game.phase === 'running') { this.game.pause(); this.queueUI(); }
     }));
@@ -475,16 +481,23 @@ export class TidekeeperSystem extends createSystem({
         ? 'The headset did not start the session. Accept the permission prompt and press Play again, or untick "Show my room" to play in VR.'
         : 'The headset did not start the session. Accept the permission prompt and press Play again.';
     }
-    if (this.world.session && !this.xrPlaced) { this.placeBoard(); this.xrPlaced = true; this.queueUI(); }
+    if (this.world.session && !this.xrPlaced) {
+      this.placeBoard(); this.xrPlaced = true; this.queueUI();
+      // The SDK samples visibility once per frame; a headset that stops frames first would skip the hidden state.
+      const session = this.world.session;
+      session.addEventListener('visibilitychange', () => { if (session.visibilityState !== 'visible' && this.game.phase === 'running') { this.game.pause(); this.queueUI(); } });
+    }
     (this.water.material as ShaderMaterial).uniforms.time.value = time;
-    if (this.game.advance(delta)) this.queueUI();
+    // A long frame gap (system menu, headset off) must not jump a running delivery ahead.
+    if (this.game.advance(Math.min(delta, 0.25))) this.queueUI();
     for (const slot of TOUCHES) this.touchQuiet[slot] = Math.min(1, this.touchQuiet[slot] + delta);
     // A hand turning the dial sweeps toward the card beside it. If the card stays touchable, the SDK hands that hand's near
     // pointer to the card and drops the grab mid-turn, so the card stops taking input while anything is held.
     const holding = this.queries.held.entities.size > 0;
+    // When it comes back, a finger already on a button must lift and press again: releasing beside the card is not a press.
     if (holding === this.panelEntity.hasComponent(PokeInteractable)) {
       if (holding) this.panelEntity.removeComponent(PokeInteractable).removeComponent(RayInteractable);
-      else this.panelEntity.addComponent(RayInteractable).addComponent(PokeInteractable);
+      else { this.panelEntity.addComponent(RayInteractable).addComponent(PokeInteractable); this.panelMovedAt = this.now; }
     }
     for (const e of this.queries.pokeCommits.entities) {
       if (e.hasComponent(Grabbed)) continue;

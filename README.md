@@ -45,8 +45,11 @@ piece back. Undo, redo, restart and hints are always one press away.
 - No fast or two-handed gestures, no gaze requirement. Large buttons with visible press depth; each press fires once.
 - Boats and docks carry matching shape emblems (circle, triangle, square, diamond), never colour alone.
 - Every sound has a visual equivalent, and sound can be turned off.
-- The mission card stands beside the board, within seated reach of that hand; Settings moves it to the left for
-  left-handed play. Reach (near/far) and a move control adjust the board.
+- The mission card stands beside the board, within seated reach of that hand. The entry card (before Play) or
+  Settings puts it on the left for left-handed play. While a hand holds a piece or the dial the card takes no input,
+  and a finger already on it must lift before it presses again. Reach (near/far) and a move control adjust the board.
+- A delivery pauses whenever the headset session is not fully visible; a refused session request is explained on the
+  entry card.
 
 ## Tech
 
