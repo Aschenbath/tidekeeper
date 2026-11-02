@@ -49,6 +49,7 @@ export class TidekeeperSystem extends createSystem({
   private moveControls = false;
   private ready = false;
   private xrPlaced = false;
+  private sessionSeenAt?: number;
   private launching = false;
   private dialTurn = startDialTurn();
   private shownTick = -1;
@@ -434,10 +435,17 @@ export class TidekeeperSystem extends createSystem({
     this.cleanupFuncs.push(this.world.visibilityState.subscribe(state => {
       const immersive = state !== VisibilityState.NonImmersive;
       document.getElementById('entry')!.hidden = immersive;
-      if (!immersive) { this.xrPlaced = false; (document.getElementById('left-card') as HTMLInputElement).checked = this.panelLeft; }
+      if (!immersive) { this.xrPlaced = false; this.sessionSeenAt = undefined; (document.getElementById('left-card') as HTMLInputElement).checked = this.panelLeft; }
       // A run keeps going only while the player can see it: system menu, headset off or leaving the session all pause it.
       if (state !== VisibilityState.Visible && this.game.phase === 'running') { this.game.pause(); this.queueUI(); }
     }));
+  }
+  /** A headset can start a session a few frames before it reports a real head pose; placing the board from the
+   * pre-session camera would put it at a desktop height or facing the wrong way. */
+  private headTracked() {
+    const frame = this.world.renderer.xr.getFrame(), reference = this.world.renderer.xr.getReferenceSpace();
+    const pose = frame && reference ? frame.getViewerPose(reference) : null;
+    return !!pose && !pose.emulatedPosition;
   }
   private placeBoard() {
     this.player.head.getWorldPosition(this.head); this.player.head.getWorldDirection(this.direction);
@@ -483,7 +491,9 @@ export class TidekeeperSystem extends createSystem({
         ? 'The headset did not start the session. Accept the permission prompt and press Play again, or untick "Show my room" to play in VR.'
         : 'The headset did not start the session. Accept the permission prompt and press Play again.';
     }
-    if (this.world.session && !this.xrPlaced) {
+    if (this.world.session && !this.xrPlaced) this.sessionSeenAt ??= this.now;
+    // Wait for a tracked head pose, but never longer than 1.5 s: a board placed late beats no board.
+    if (this.world.session && !this.xrPlaced && (this.headTracked() || this.now - this.sessionSeenAt! > 1.5)) {
       this.placeBoard(); this.xrPlaced = true; this.queueUI();
       // The SDK samples visibility once per frame; a headset that stops frames first would skip the hidden state.
       const session = this.world.session;
