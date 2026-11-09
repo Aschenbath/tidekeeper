@@ -395,6 +395,12 @@ export class TidekeeperSystem extends createSystem({
     if (this.game.phase === 'running') this.game.pause();
     this.view = view; this.refresh();
   }
+  private pauseForHiddenView() {
+    // Keep a completed first mission on screen after an interruption: the player can use Next on return.
+    clearTimeout(this.resultTimer);
+    this.resultTimer = undefined;
+    if (this.game.phase === 'running') { this.game.pause(); this.queueUI(); }
+  }
   private selectMission(index: number) {
     if (this.view !== 'map' || this.hasCarry()) return;
     if (!this.campaign.select(index)) { this.message = 'Deliver the previous village first.'; this.refresh(); return; }
@@ -432,12 +438,15 @@ export class TidekeeperSystem extends createSystem({
       this.world.launchXR({ sessionMode: mode.checked && supportsAR ? SessionMode.ImmersiveAR : SessionMode.ImmersiveVR });
     };
     play.addEventListener('click', start); this.cleanupFuncs.push(() => play.removeEventListener('click', start));
+    const onDocumentVisibility = () => { if (document.hidden) this.pauseForHiddenView(); };
+    document.addEventListener('visibilitychange', onDocumentVisibility);
+    this.cleanupFuncs.push(() => document.removeEventListener('visibilitychange', onDocumentVisibility));
     this.cleanupFuncs.push(this.world.visibilityState.subscribe(state => {
       const immersive = state !== VisibilityState.NonImmersive;
       document.getElementById('entry')!.hidden = immersive;
       if (!immersive) { this.xrPlaced = false; this.sessionSeenAt = undefined; (document.getElementById('left-card') as HTMLInputElement).checked = this.panelLeft; }
       // A run keeps going only while the player can see it: system menu, headset off or leaving the session all pause it.
-      if (state !== VisibilityState.Visible && this.game.phase === 'running') { this.game.pause(); this.queueUI(); }
+      if (state !== VisibilityState.Visible) this.pauseForHiddenView();
     }));
   }
   /** A headset can start a session a few frames before it reports a real head pose; placing the board from the
@@ -497,7 +506,9 @@ export class TidekeeperSystem extends createSystem({
       this.placeBoard(); this.xrPlaced = true; this.queueUI();
       // The SDK samples visibility once per frame; a headset that stops frames first would skip the hidden state.
       const session = this.world.session;
-      session.addEventListener('visibilitychange', () => { if (session.visibilityState !== 'visible' && this.game.phase === 'running') { this.game.pause(); this.queueUI(); } });
+      const onVisibilityChange = () => { if (session.visibilityState !== 'visible') this.pauseForHiddenView(); };
+      session.addEventListener('visibilitychange', onVisibilityChange);
+      this.cleanupFuncs.push(() => session.removeEventListener('visibilitychange', onVisibilityChange));
     }
     const controllers = !!this.world.session && HANDS.some((side) => this.input.xr.isPrimary('controller', side));
     if (controllers !== this.controllers) { this.controllers = controllers; this.queueUI(); }
@@ -573,7 +584,12 @@ export class TidekeeperSystem extends createSystem({
     if (newResult && phase === 'success') {
       this.mapUnlocked ||= s.mission.id === 'm05';
       if (s.mission.id === 'm01' && this.missionOneMs === null) this.missionOneMs = performance.now() - this.missionStarted;
-      if (this.autoAdvance && s.mission.id === 'm01') this.resultTimer = setTimeout(() => { if (this.game === s && s.phase === 'success' && this.view === 'game') this.nextMission(); }, 2400);
+      if (this.autoAdvance && s.mission.id === 'm01') this.resultTimer = setTimeout(() => {
+        // A queued result refresh may run after visibility changed, so check again before advancing.
+        if (this.game === s && s.phase === 'success' && this.view === 'game'
+          && !document.hidden && document.getElementById('entry')?.hidden
+          && (!this.world.session || this.world.session.visibilityState === 'visible')) this.nextMission();
+      }, 2400);
     }
     // Both boats in a collision report the same reason; say it once.
     const reason = failure && s.simulation.outcome.kind === 'failure' ? [...new Set(s.simulation.outcome.failures.map(f => f.reason))].join('; ') : '';

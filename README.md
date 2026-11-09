@@ -50,8 +50,9 @@ piece back. Undo, redo, restart and hints are always one press away.
 - The mission card stands beside the board, within seated reach of that hand. The entry card (before Play) or
   Settings puts it on the left for left-handed play. While a hand holds a piece or the dial the card takes no input,
   and a finger already on it must lift before it presses again. Reach (near/far) and a move control adjust the board.
-- A delivery pauses whenever the headset session is not fully visible; a refused session request is explained on the
-  entry card.
+- A delivery pauses whenever the headset session is not fully visible or the browser tab is hidden; resume it with
+  the card's Resume button. An interruption also cancels the first mission's automatic transition, so its success
+  card stays available until you press Next. A refused session request is explained on the entry card.
 
 ## Tech
 
@@ -63,6 +64,7 @@ or fonts from third-party CDNs, no accounts, no analytics.
 npm ci
 npm test            # rules, solver, missions, daily remix, progress, models
 npm run typecheck
+npm run test:visibility # with the IWSDK dev server running: pause, interrupted results and manual continuation
 npm run build       # dist/
 npm run build:pages # dist/ for a GitHub Pages project site at /tidekeeper/
 ```
